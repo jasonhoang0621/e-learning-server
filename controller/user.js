@@ -10,18 +10,18 @@ async function login(req, res) {
   try {
     const user = await database.userModel().findOne({ email: req.body.email });
     if (!user) {
-      return res.json({ errorCode: true, data: "Wrong email or password" });
+      return res.res(400).json({ errorCode: true, data: "Wrong email or password" });
     }
     const checkPass = await bcrypt.compare(req.body.password, user.password);
     if (!checkPass) {
-      return res.json({ errorCode: true, data: "Wrong email or password" });
+      return res.res(400).json({ errorCode: true, data: "Wrong email or password" });
     }
     user.token = await jwt.createSecretKey(req.body.email);
     delete user.password;
     return res.json({ errorCode: null, data: user });
   } catch (error) {
     console.log(error);
-    return res.json({ errorCode: true, data: error });
+    return res.res(400).json({ errorCode: true, data: error });
   }
 }
 async function register(req, res) {
@@ -29,17 +29,17 @@ async function register(req, res) {
     const validation = req.body;
     for (property of userCol.validation) {
       if (validation[property] === null || validation[property] === "") {
-        return res.json({ errorCode: true, data: `Lack of ${property}` });
+        return res.res(400).json({ errorCode: true, data: `Lack of ${property}` });
       }
     }
     const user = await database.userModel().findOne({ email: req.body.email });
     if (user) {
-      return res.json({ errorCode: true, data: "Existing email" });
+      return res.res(400).json({ errorCode: true, data: "Existing email" });
     }
     if (req.body.rePassword) {
       const checkPass = req.body.password == req.body.rePassword;
       if (!checkPass) {
-        return res.json({ errorCode: true, data: "Wrong retype password" });
+        return res.res(400).json({ errorCode: true, data: "Wrong retype password" });
       }
     }
     const password = await bcrypt.hash(req.body.password, saltRounds);
@@ -53,7 +53,7 @@ async function register(req, res) {
     await userCol.create(data);
     return res.json({ errorCode: null, data: data });
   } catch (error) {
-    return res.json({ errorCode: true, data: "System error" });
+    return res.res(400).json({ errorCode: true, data: "System error" });
   }
 }
 
@@ -61,12 +61,12 @@ async function profile(req, res) {
   try {
     const user = await database.userModel().findOne({ email: req.body.email });
     if (!user) {
-      return res.json({ errorCode: true, data: "Wrong email or password" });
+      return res.res(401).json({ errorCode: true, data: "No User" });
     }
     delete user.password;
     return res.json({ errorCode: null, data: user });
   } catch (error) {
-    return res.json({ errorCode: true, data: error });
+    return res.res(400).json({ errorCode: true, data: error });
   }
 }
 
@@ -74,7 +74,7 @@ async function userAuthentication(req, res, next) {
   try {
     let token = req.headers["authorization"];
     if (!token) {
-      return res.json({
+      return res.res(401).json({
         errorCode: true,
         data: "No token provided",
       });
@@ -91,7 +91,7 @@ async function userAuthentication(req, res, next) {
       });
     }
     if (!verify) {
-      return res.json({
+      return res.res(401).json({
         errorCode: true,
         data: "Failed to authenticate token",
       });
@@ -101,7 +101,7 @@ async function userAuthentication(req, res, next) {
     user = await database.userModel().find({ email: verify }).toArray();
 
     if (user.length == 0 || user.length > 1) {
-      return res.json({
+      return res.res(401).json({
         errorCode: true,
         data: "No user found",
       });
