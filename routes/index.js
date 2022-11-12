@@ -5,7 +5,9 @@ const controllers = {
   user: require("../controller/user.js"),
 };
 
-const middleWares = {};
+const middleWares = {
+  Authorization: controllers.user.userAuthentication,
+};
 const bindRouter = (app) => {
   for (let i = 0; i < event.length; i++) {
     for (let j = 0; j < event[i].length; j++) {

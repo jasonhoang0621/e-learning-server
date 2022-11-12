@@ -13,5 +13,12 @@ commands = [
     api: "/api/register",
     middleware: [],
   },
+  {
+    name: "profile",
+    controller: "user",
+    method: "get",
+    api: "/api/profile",
+    middleware: ["Authorization"],
+  },
 ];
 module.exports = commands;

@@ -17,7 +17,7 @@ app.use(
 );
 
 database.connectDatabase(() => {
-  console.log("connect success");
+  console.log("connect database success");
 });
 
 routerCustom.bindRouter(app);
