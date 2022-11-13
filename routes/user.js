@@ -20,5 +20,12 @@ commands = [
     api: "/api/profile",
     middleware: ["Authorization"],
   },
+  {
+    name: "refreshToken",
+    controller: "user",
+    method: "post",
+    api: "/api/refreshToken",
+    middleware: [],
+  },
 ];
 module.exports = commands;
