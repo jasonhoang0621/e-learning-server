@@ -73,7 +73,7 @@ async function register(req, res) {
 
 async function profile(req, res) {
   try {
-    const user = await database.userModel().findOne({ email: req.body.email });
+    const user = await database.userModel().findOne({ email: req.user.email });
     if (!user) {
       return res.status(401).json({ errorCode: true, data: "No User" });
     }
