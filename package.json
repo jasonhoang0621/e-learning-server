@@ -4,7 +4,8 @@
     "private": true,
     "scripts": {
         "start": "nodemon app.js",
-        "test": "lint-staged"
+        "test": "lint-staged",
+        "prepare": "husky install"
     },
     "dependencies": {
         "axios": "^0.27.2",
@@ -31,7 +32,7 @@
         "nodemon": "^2.0.18"
     },
     "lint-staged": {
-        "*": "yarn prettier --write --ignore-unknown"
+        "**/*": "prettier --write --ignore-unknown"
     },
     "husky": {
         "hooks": {
@@ -41,6 +42,6 @@
     "devDependencies": {
         "husky": "^8.0.2",
         "lint-staged": "^13.0.3",
-        "prettier": "^2.7.1"
+        "prettier": "2.7.1"
     }
 }
