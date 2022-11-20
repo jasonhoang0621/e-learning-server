@@ -29,12 +29,6 @@
         "nodemailer": "^6.7.8",
         "nodemon": "^2.0.18"
     },
-    "eslintConfig": {
-        "extends": [
-            "react-app",
-            "react-app/jest"
-        ]
-    },
     "lint-staged": {
         "**/*": "prettier --write --ignore-unknown"
     },
