@@ -31,7 +31,7 @@
         "nodemon": "^2.0.18"
     },
     "lint-staged": {
-        "*": "prettier --write --ignore-unknown"
+        "*": "yarn prettier --write --ignore-unknown"
     },
     "husky": {
         "hooks": {
