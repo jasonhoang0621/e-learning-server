@@ -1,19 +1,19 @@
-const database = require("../utils/database");
-const userProperties = ["email", "password", "refreshToken"];
-const validation = ["email", "password"];
+const database = require('../utils/database')
+const userProperties = ['email', 'password', 'refreshToken']
+const validation = ['email', 'password']
 
 async function create(data) {
-  return await database.userModel().insertOne(data);
+    return await database.userModel().insertOne(data)
 }
 
 async function getDetailByEmail(email) {
-  const result = await database.userModel().find({ email }).toArray();
-  return result[0];
+    const result = await database.userModel().find({ email }).toArray()
+    return result[0]
 }
 
 module.exports = {
-  create,
-  getDetailByEmail,
-  validation,
-  userProperties,
-};
+    create,
+    getDetailByEmail,
+    validation,
+    userProperties,
+}

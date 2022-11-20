@@ -3,7 +3,8 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "start": "nodemon app.js"
+        "start": "nodemon app.js",
+        "test": "lint-staged"
     },
     "dependencies": {
         "axios": "^0.27.2",
@@ -30,7 +31,7 @@
         "nodemon": "^2.0.18"
     },
     "lint-staged": {
-        "*": "prettier --write --ignore-unknown"
+        "**/*": "prettier --write --ignore-unknown"
     },
     "husky": {
         "hooks": {
