@@ -96,12 +96,10 @@ async function profile(req, res) {
 
 async function refreshToken(req, res) {
     try {
-        const user = await database
-            .userModel()
-            .findOne({
-                email: req.body.email,
-                refreshToken: req.body.refreshToken,
-            })
+        const user = await database.userModel().findOne({
+            email: req.body.email,
+            refreshToken: req.body.refreshToken,
+        })
         if (!user) {
             return res.status(401).json({ errorCode: true, data: 'No User' })
         }
@@ -173,11 +171,30 @@ async function userAuthentication(req, res, next) {
         return res.json({ errorCode: true, data: 'system error' })
     }
 }
-
+const googleOauth = async (req, res) => {
+    const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
+    const options = {
+        redirect_uri: process.env.GOOGLE_REDIRECT,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        access_type: 'offline',
+        response_type: 'code',
+        prompt: 'consent',
+        scope: [
+            'https://www.googleapis.com/auth/userinfo.email',
+            'https://www.googleapis.com/auth/userinfo.profile',
+        ].join(' '),
+    }
+    console.log(options)
+    const qs = new URLSearchParams(options)
+    return res.redirect(`${rootUrl}?${qs.toString()}`)
+}
+const verifyGoogle = async (res, req) => {}
 module.exports = {
     login,
     register,
     profile,
     refreshToken,
     userAuthentication,
+    googleOauth,
+    verifyGoogle,
 }

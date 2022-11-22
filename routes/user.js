@@ -27,5 +27,19 @@ commands = [
         api: '/api/refreshToken',
         middleware: [],
     },
+    {
+        name: 'googleOauth',
+        controller: 'user',
+        method: 'get',
+        api: '/api/loginGoogle',
+        middleware: [],
+    },
+    {
+        name: 'verifyGoogle',
+        controller: 'user',
+        method: 'get',
+        api: '/api/oauth/google',
+        middleware: [],
+    },
 ]
 module.exports = commands
