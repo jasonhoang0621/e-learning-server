@@ -9,7 +9,7 @@ async function login(req, res) {
     try {
         const user = await database
             .userModel()
-            .findOne({ email: req.body.email })
+            .findOne({ email: req.body.email, loginService: false })
         if (!user) {
             return res
                 .status(400)
@@ -70,6 +70,8 @@ async function register(req, res) {
             email: req.body.email,
             password: password,
             createdAt: new Date(),
+            loginService: false,
+            email_verified: false,
         }
         await userCol.create(data)
         delete data.password
@@ -184,11 +186,54 @@ const googleOauth = async (req, res) => {
             'https://www.googleapis.com/auth/userinfo.profile',
         ].join(' '),
     }
-    console.log(options)
     const qs = new URLSearchParams(options)
     return res.redirect(`${rootUrl}?${qs.toString()}`)
 }
-const verifyGoogle = async (res, req) => {}
+const verifyGoogle = async (req, res) => {
+    try {
+        const code = req.query.code
+        const data = await userCol.getGoogleToken(code)
+        const googleUser = await jwt.decodeToken(data.id_token)
+        let user = await userCol.findOne(googleUser.email)
+        if (!user) {
+            let data = {
+                id: ObjectID().toString(),
+                email: googleUser.email,
+                password: null,
+                createdAt: new Date(),
+                loginService: false,
+                email_verified: true,
+            }
+            await userCol.create(data)
+            data.token = await jwt.createSecretKey({ email: googleUser.email })
+            data.refreshToken = await jwt.createRefreshToken({
+                email: googleUser.email,
+            })
+            delete data.password
+            await database
+                .userModel()
+                .updateOne(
+                    { email: googleUser.email },
+                    { $set: { refreshToken: data.refreshToken } }
+                )
+            return res.json({ errorCode: null, data: data })
+        }
+        user.token = await jwt.createSecretKey({ email: googleUser.email })
+        user.refreshToken = await jwt.createRefreshToken({
+            email: googleUser.email,
+        })
+        delete user.password
+        await database
+            .userModel()
+            .updateOne(
+                { email: googleUser.email },
+                { $set: { refreshToken: user.refreshToken } }
+            )
+        return res.json({ errorCode: null, data: user })
+    } catch (error) {
+        return res.redirect('http://localhost:4000/')
+    }
+}
 module.exports = {
     login,
     register,
