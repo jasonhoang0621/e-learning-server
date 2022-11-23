@@ -67,6 +67,7 @@ async function register(req, res) {
         const password = await bcrypt.hash(req.body.password, saltRounds)
         const data = {
             id: ObjectID().toString(),
+            name: req.body.name,
             email: req.body.email,
             password: password,
             createdAt: new Date(),
@@ -202,6 +203,7 @@ const verifyGoogle = async (req, res) => {
         if (!user) {
             let data = {
                 id: ObjectID().toString(),
+                name: googleUser.name,
                 email: googleUser.email,
                 password: null,
                 createdAt: new Date(),
