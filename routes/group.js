@@ -1,5 +1,12 @@
 commands = [
     {
+        name: 'create',
+        controller: 'group',
+        method: 'post',
+        api: '/api/group',
+        middleware: ['Authorization'],
+    },
+    {
         name: 'getAll',
         controller: 'group',
         method: 'get',
@@ -11,13 +18,6 @@ commands = [
         controller: 'group',
         method: 'get',
         api: '/api/group/:code',
-        middleware: ['Authorization'],
-    },
-    {
-        name: 'create',
-        controller: 'group',
-        method: 'post',
-        api: '/api/group',
         middleware: ['Authorization'],
     },
 ]

@@ -21,6 +21,21 @@ function dataPagination(match, sort, page = 1, limit = 10, join = false) {
     aggregate.push({ $facet: facet })
     return aggregate
 }
+function joinUser(aggregate = []) {
+    aggregate.push({
+        $lookup: {
+            from: 'user',
+            localField: 'members',
+            foreignField: 'id',
+            as: 'user',
+        },
+    })
+    // aggregate.push({
+    //   $unwind: { path: "$user", preserveNullAndEmptyArrays: true },
+    // });
+    return aggregate
+}
 module.exports = {
     dataPagination,
+    joinUser,
 }

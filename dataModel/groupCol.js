@@ -1,6 +1,6 @@
 const database = require('../utils/database')
 const { dataPagination } = require('../helperFunction/helper')
-createValidation = ['name']
+const createValidation = ['name']
 async function create(data) {
     return await database.groupModel().insertOne(data)
 }
@@ -15,12 +15,18 @@ async function getAll(sort, page, limit, match) {
     }
     return newResult
 }
-async function findOne(id) {
-    return await database.groupModel().findOne({ id: id })
+async function findOne(id, join = []) {
+    console.log(join)
+    console.log(id)
+    return await database
+        .groupModel()
+        .aggregate([{ $match: { id: id } }, ...join])
+        .toArray()
 }
 module.exports = {
     create,
     // validation,
     findOne,
+    createValidation,
     getAll,
 }
