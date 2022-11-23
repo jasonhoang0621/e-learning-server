@@ -11,6 +11,11 @@ async function getDetailByEmail(email) {
     const result = await database.userModel().find({ email }).toArray()
     return result[0]
 }
+async function updateStatus(email) {
+    await database
+        .userModel()
+        .findOneAndUpdate({ email: email }, { $set: { email_verified: true } })
+}
 
 async function getGoogleToken(code) {
     const url = 'https://oauth2.googleapis.com/token'
@@ -42,4 +47,5 @@ module.exports = {
     userProperties,
     getGoogleToken,
     findOne,
+    updateStatus,
 }

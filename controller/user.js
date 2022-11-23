@@ -3,8 +3,8 @@ const database = require('../utils/database')
 const jwt = require('../utils/token')
 const bcrypt = require('bcrypt')
 const ObjectID = require('mongodb').ObjectId
+const emailCol = require('../utils/email.js')
 const saltRounds = 10
-
 async function login(req, res) {
     try {
         const user = await database
@@ -75,6 +75,10 @@ async function register(req, res) {
         }
         await userCol.create(data)
         delete data.password
+        const resultEmail = await emailCol.sendEmail(data.email)
+        if (!resultEmail) {
+            return res.json({ errorCode: true, data: 'Error send email' })
+        }
         return res.json({ errorCode: null, data: data })
     } catch (error) {
         return res.status(400).json({ errorCode: true, data: 'System error' })
@@ -234,6 +238,12 @@ const verifyGoogle = async (req, res) => {
         return res.redirect('http://localhost:4000/')
     }
 }
+const verifyEmail = async (req, res) => {
+    const email = req.params.code
+    console.log(email)
+    const user = await userCol.updateStatus(email)
+    return res.redirect('http://localhost:4000/')
+}
 module.exports = {
     login,
     register,
@@ -242,4 +252,5 @@ module.exports = {
     userAuthentication,
     googleOauth,
     verifyGoogle,
+    verifyEmail,
 }

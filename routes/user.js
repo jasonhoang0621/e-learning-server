@@ -41,5 +41,12 @@ commands = [
         api: '/api/oauth/google',
         middleware: [],
     },
+    {
+        name: 'verifyEmail',
+        controller: 'user',
+        method: 'get',
+        api: '/api/verifyEmail/:code',
+        middleware: [],
+    },
 ]
 module.exports = commands
