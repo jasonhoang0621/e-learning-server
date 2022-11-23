@@ -48,5 +48,12 @@ commands = [
         api: '/api/verifyEmail/:code',
         middleware: [],
     },
+    {
+        name: 'changePass',
+        controller: 'user',
+        method: 'patch',
+        api: '/api/changePass',
+        middleware: ['Authorization'],
+    },
 ]
 module.exports = commands

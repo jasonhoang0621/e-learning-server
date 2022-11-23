@@ -1,5 +1,11 @@
 const database = require('../utils/database')
-const userProperties = ['email', 'password', 'refreshToken']
+const userProperties = [
+    'email',
+    'password',
+    'refreshToken',
+    'email_verified',
+    'loginService',
+]
 const validation = ['email', 'password']
 const qs = require('querystring')
 const { default: axios } = require('axios')
@@ -15,6 +21,16 @@ async function updateStatus(email) {
     await database
         .userModel()
         .findOneAndUpdate({ email: email }, { $set: { email_verified: true } })
+}
+async function update(email, data) {
+    data['updateAt'] = new Date()
+    const result = await database.groupModel().findOneAndUpdate(
+        { email: email },
+        {
+            $set: data,
+        }
+    )
+    return result.value
 }
 
 async function getGoogleToken(code) {
@@ -48,4 +64,5 @@ module.exports = {
     getGoogleToken,
     findOne,
     updateStatus,
+    update,
 }

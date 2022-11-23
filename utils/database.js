@@ -2,6 +2,7 @@ const { MongoClient } = require('mongodb')
 const config = require('../config/database.json')
 
 let _userModel = null
+let _groupModel = null
 
 async function connectDatabase(callback) {
     const client = new MongoClient(config.uri)
@@ -11,6 +12,7 @@ async function connectDatabase(callback) {
         console.log('connect to DB Success', config.uri)
 
         _userModel = db.collection('user')
+        _groupModel = db.collection('group')
 
         callback()
     } catch (e) {
@@ -25,8 +27,16 @@ const userModel = function () {
         return _userModel
     }
 }
+const groupModel = function () {
+    if (_groupModel == null) {
+        console.log('Instance is null or undefined')
+    } else {
+        return _groupModel
+    }
+}
 
 module.exports = {
     userModel,
+    groupModel,
     connectDatabase,
 }

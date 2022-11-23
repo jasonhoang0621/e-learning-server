@@ -192,7 +192,10 @@ const googleOauth = async (req, res) => {
         ].join(' '),
     }
     const qs = new URLSearchParams(options)
-    return res.redirect(`${rootUrl}?${qs.toString()}`)
+    return res.json({
+        errorCode: null,
+        data: `${rootUrl}?${qs.toString()}`,
+    })
 }
 const verifyGoogle = async (req, res) => {
     try {
@@ -246,6 +249,34 @@ const verifyEmail = async (req, res) => {
     const user = await userCol.updateStatus(email)
     return res.redirect('http://localhost:4000/')
 }
+const changePass = async (req, res) => {
+    const user = req.user
+    let body = req.body
+    const data = await userCol.getDetailByEmail(user.email)
+    if (!data) {
+        return res.json({ errorCode: true, data: 'No User' })
+    }
+    const checkPass = await bcrypt.compare(body.oldPassword, data.password)
+    if (!checkPass) {
+        return res.json({ errorCode: true, data: 'Wrong password' })
+    }
+    if (body.password !== body.confirmPassword) {
+        return res.json({ errorCode: true, data: 'Confirm password not match' })
+    }
+    delete body.confirmPassword
+    const password = await bcrypt.hash(body.password, saltRounds)
+    body.password = password
+    const update = await userCol.update(email, body)
+    if (!update) {
+        return res.json({ errorCode: true, data: 'Update fail' })
+    }
+    for (property of userCol.userProperties) {
+        if (req.body[property]) {
+            update[property] = req.body[property]
+        }
+    }
+    return res.json({ errorCode: null, data: update })
+}
 module.exports = {
     login,
     register,
@@ -255,4 +286,5 @@ module.exports = {
     googleOauth,
     verifyGoogle,
     verifyEmail,
+    changePass,
 }

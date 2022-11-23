@@ -1,8 +1,10 @@
 const userCommand = require('./user.js')
+const groupCommand = require('./group.js')
 
-const event = [userCommand]
+const event = [userCommand, groupCommand]
 const controllers = {
     user: require('../controller/user.js'),
+    group: require('../controller/group.js'),
 }
 
 const middleWares = {
