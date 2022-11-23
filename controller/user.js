@@ -260,10 +260,10 @@ const changePass = async (req, res) => {
     if (!checkPass) {
         return res.json({ errorCode: true, data: 'Wrong password' })
     }
-    if (body.password !== body.confirmPassword) {
+    if (body.password !== body.rePassword) {
         return res.json({ errorCode: true, data: 'Confirm password not match' })
     }
-    delete body.confirmPassword
+    delete body.rePassword
     const password = await bcrypt.hash(body.password, saltRounds)
     body.password = password
     const update = await userCol.update(email, body)
