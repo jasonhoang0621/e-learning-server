@@ -210,7 +210,7 @@ const verifyGoogle = async (req, res) => {
                 email: googleUser.email,
                 password: null,
                 createdAt: new Date(),
-                loginService: false,
+                loginService: true,
                 email_verified: true,
             }
             await userCol.create(data)
@@ -277,6 +277,54 @@ const changePass = async (req, res) => {
     }
     return res.json({ errorCode: null, data: update })
 }
+
+const update = async (req, res) => {
+    const user = req.user
+    const data = await userCol.getDetailByEmail(user.email)
+    if (!data) {
+        return res.json({ errorCode: true, data: 'No User' })
+    }
+    const update = await userCol.update(user.email, req.body)
+    if (!update) {
+        return res.json({ errorCode: true, data: 'Update fail' })
+    }
+    for (property of userCol.userProperties) {
+        if (req.body[property]) {
+            update[property] = req.body[property]
+        }
+    }
+    return res.json({ errorCode: null, data: update })
+}
+const getAll = async (req, res) => {
+    const sortBy = {
+        createdAt: -1,
+    }
+    const page = req.query.page ?? defaultPage
+    const limit = req.query.limit ?? recordPerPage
+    let match = {}
+    match['deletedAt'] = null
+    const data = await userCol.getAll(page, limit, sortBy, match)
+    if (!data) {
+        return res.json({
+            errorCode: true,
+            data: 'System error',
+            metadata: {
+                recordTotal: 0,
+                pageCurrent: page,
+                recordPerPage: limit,
+            },
+        })
+    }
+    return res.json({
+        errorCode: null,
+        data: data.data,
+        metadata: data.metadata[0] ?? {
+            recordTotal: 0,
+            pageCurrent: page,
+            recordPerPage: limit,
+        },
+    })
+}
 module.exports = {
     login,
     register,
@@ -287,4 +335,6 @@ module.exports = {
     verifyGoogle,
     verifyEmail,
     changePass,
+    update,
+    getAll,
 }

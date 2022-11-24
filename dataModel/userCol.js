@@ -56,6 +56,10 @@ async function getGoogleToken(code) {
 async function findOne(email) {
     return await database.userModel().findOne({ email: email })
 }
+async function findOneById(id) {
+    return await database.userModel().findOne({ id: id })
+}
+async function getAll() {}
 module.exports = {
     create,
     getDetailByEmail,
@@ -65,4 +69,6 @@ module.exports = {
     findOne,
     updateStatus,
     update,
+    getAll,
+    findOneById,
 }

@@ -16,12 +16,17 @@ async function getAll(sort, page, limit, match) {
     return newResult
 }
 async function findOne(id, join = []) {
-    console.log(join)
-    console.log(id)
-    return await database
+    const result = await database
         .groupModel()
         .aggregate([{ $match: { id: id } }, ...join])
         .toArray()
+    return result[0]
+}
+async function addGroup(id, user) {
+    const result = await database
+        .groupModel()
+        .findOneAndUpdate({ id: id }, { $push: { members: user } })
+    return result.value
 }
 module.exports = {
     create,
@@ -29,4 +34,5 @@ module.exports = {
     findOne,
     createValidation,
     getAll,
+    addGroup,
 }

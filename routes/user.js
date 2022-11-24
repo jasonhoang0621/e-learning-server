@@ -14,9 +14,23 @@ commands = [
         middleware: [],
     },
     {
+        name: 'getAll',
+        controller: 'user',
+        method: 'post',
+        api: '/api/user',
+        middleware: [],
+    },
+    {
         name: 'profile',
         controller: 'user',
         method: 'get',
+        api: '/api/profile',
+        middleware: ['Authorization'],
+    },
+    {
+        name: 'update',
+        controller: 'user',
+        method: 'patch',
         api: '/api/profile',
         middleware: ['Authorization'],
     },

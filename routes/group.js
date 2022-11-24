@@ -14,6 +14,13 @@ commands = [
         middleware: ['Authorization'],
     },
     {
+        name: 'addMember',
+        controller: 'group',
+        method: 'post',
+        api: '/api/group/:code',
+        middleware: ['Authorization'],
+    },
+    {
         name: 'getOne',
         controller: 'group',
         method: 'get',

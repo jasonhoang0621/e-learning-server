@@ -25,17 +25,23 @@ function joinUser(aggregate = []) {
     aggregate.push({
         $lookup: {
             from: 'user',
-            localField: 'members',
+            localField: 'members.id',
             foreignField: 'id',
             as: 'user',
         },
     })
-    // aggregate.push({
-    //   $unwind: { path: "$user", preserveNullAndEmptyArrays: true },
-    // });
     return aggregate
+}
+function hideUserInfo(users) {
+    console.log(users)
+    for (let i = 0; i < users.length; i++) {
+        delete users[i].password
+        delete users[i].refreshToken
+    }
+    return users
 }
 module.exports = {
     dataPagination,
     joinUser,
+    hideUserInfo,
 }
