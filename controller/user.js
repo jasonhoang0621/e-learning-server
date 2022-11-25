@@ -104,21 +104,20 @@ async function profile(req, res) {
 async function refreshToken(req, res) {
     try {
         const user = await database.userModel().findOne({
-            email: req.body.email,
             refreshToken: req.body.refreshToken,
         })
         if (!user) {
             return res.status(401).json({ errorCode: true, data: 'No User' })
         }
-        user.token = await jwt.createSecretKey({ email: req.body.email })
+        user.token = await jwt.createSecretKey({ email: user.email })
         user.refreshToken = await jwt.createRefreshToken({
-            email: req.body.email,
+            email: user.email,
         })
         delete user.password
         await database
             .userModel()
             .updateOne(
-                { email: req.body.email },
+                { email: user.email },
                 { $set: { refreshToken: user.refreshToken } }
             )
         return res.json({ errorCode: null, data: user })
