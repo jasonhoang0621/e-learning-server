@@ -12,7 +12,9 @@ const getAll = async (req, res) => {
         const limit = req.query.limit ?? recordPerPage
         let match = {}
         match['deletedAt'] = null
+        console.log(match)
         const data = await groupCol.getAll(page, limit, sortBy, match)
+        console.log('data', data)
         if (!data) {
             return res.json({
                 errorCode: true,
@@ -26,12 +28,7 @@ const getAll = async (req, res) => {
         }
         return res.json({
             errorCode: null,
-            data: data.data,
-            metadata: data.metadata[0] ?? {
-                recordTotal: 0,
-                pageCurrent: page,
-                recordPerPage: limit,
-            },
+            data: data,
         })
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })

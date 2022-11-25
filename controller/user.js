@@ -296,34 +296,33 @@ const update = async (req, res) => {
     return res.json({ errorCode: null, data: update })
 }
 const getAll = async (req, res) => {
-    const sortBy = {
-        createdAt: -1,
-    }
-    const page = req.query.page ?? defaultPage
-    const limit = req.query.limit ?? recordPerPage
-    let match = {}
-    match['deletedAt'] = null
-    const data = await userCol.getAll(page, limit, sortBy, match)
-    if (!data) {
+    try {
+        const sortBy = {
+            createdAt: -1,
+        }
+        const page = req.query.page ?? defaultPage
+        const limit = req.query.limit ?? recordPerPage
+        let match = {}
+        match['deletedAt'] = null
+        const data = await userCol.getAll(page, limit, sortBy, match)
+        if (!data) {
+            return res.json({
+                errorCode: true,
+                data: 'System error',
+                metadata: {
+                    recordTotal: 0,
+                    pageCurrent: page,
+                    recordPerPage: limit,
+                },
+            })
+        }
         return res.json({
-            errorCode: true,
-            data: 'System error',
-            metadata: {
-                recordTotal: 0,
-                pageCurrent: page,
-                recordPerPage: limit,
-            },
+            errorCode: null,
+            data: data,
         })
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'system error' })
     }
-    return res.json({
-        errorCode: null,
-        data: data.data,
-        metadata: data.metadata[0] ?? {
-            recordTotal: 0,
-            pageCurrent: page,
-            recordPerPage: limit,
-        },
-    })
 }
 module.exports = {
     login,

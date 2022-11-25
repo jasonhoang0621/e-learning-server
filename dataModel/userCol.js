@@ -1,4 +1,6 @@
 const database = require('../utils/database')
+const { dataPagination } = require('../helperFunction/helper')
+
 const userProperties = [
     'email',
     'password',
@@ -59,7 +61,13 @@ async function findOne(email) {
 async function findOneById(id) {
     return await database.userModel().findOne({ id: id })
 }
-async function getAll() {}
+async function getAll() {
+    let pipeline = null
+
+    pipeline = dataPagination(match, sort, page, limit)
+    const result = await database.userModel().aggregate(pipeline).toArray()
+    return result
+}
 module.exports = {
     create,
     getDetailByEmail,

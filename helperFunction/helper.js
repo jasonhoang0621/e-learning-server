@@ -11,14 +11,14 @@ function dataPagination(match, sort, page = 1, limit = 10, join = false) {
     if (join) {
         join.forEach((item) => data.push(item))
     }
-    let facet = {
-        metadata: [
-            { $count: 'recordTotal' },
-            { $addFields: { pageCurrent: page, recordPerPage: limit } },
-        ],
-        data: data,
-    }
-    aggregate.push({ $facet: facet })
+    // let facet = {
+    //     metadata: [
+    //         { $count: 'recordTotal' },
+    //         { $addFields: { pageCurrent: page, recordPerPage: limit } },
+    //     ],
+    //     data: data,
+    // }
+    // aggregate.push({ $facet: facet })
     return aggregate
 }
 function joinUser(aggregate = []) {
