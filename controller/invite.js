@@ -61,35 +61,49 @@ async function create(req, res) {
 }
 
 const joinGroup = async (req, res) => {
-    const user = req.user
-    const data = {
-        id: user.id,
-        role: 'member',
+    try {
+        const user = req.user
+        const data = {
+            id: user.id,
+            role: 'member',
+        }
+        const invite = await inviteCol.findOne(req.params.code)
+        if (!invite) {
+            return res.json({
+                errorCode: true,
+                data: 'Cannot find the invitation',
+            })
+        }
+        let result = await groupCol.addGroup(invite.groupId, data)
+        result.members.push(data)
+        return res.json({ errorCode: null, data: result })
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'system error' })
     }
-    const invite = await inviteCol.findOne(req.params.code)
-    if (!invite) {
-        return res.json({ errorCode: true, data: 'Cannot find the invitation' })
-    }
-    let result = await groupCol.addGroup(invite.groupId, data)
-    result.members.push(data)
-    return res.json({ errorCode: null, data: result })
 }
 const joinGroupByEmail = async (req, res) => {
-    if (!req.query.userId) {
-        return res.json({ errorCode: true, data: 'Error System' })
+    try {
+        if (!req.query.userId) {
+            return res.json({ errorCode: true, data: 'Error System' })
+        }
+        const userId = req.query.userId
+        const data = {
+            id: userId,
+            role: 'member',
+        }
+        const invite = await inviteCol.findOne(req.params.code)
+        if (!invite) {
+            return res.json({
+                errorCode: true,
+                data: 'Cannot find the invitation',
+            })
+        }
+        let result = await groupCol.addGroup(invite.groupId, data)
+        result.members.push(data)
+        return res.redirect('https://group-user.onrender.com/')
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'system error' })
     }
-    const userId = req.query.userId
-    const data = {
-        id: userId,
-        role: 'member',
-    }
-    const invite = await inviteCol.findOne(req.params.code)
-    if (!invite) {
-        return res.json({ errorCode: true, data: 'Cannot find the invitation' })
-    }
-    let result = await groupCol.addGroup(invite.groupId, data)
-    result.members.push(data)
-    return res.redirect('https://group-user.onrender.com/')
 }
 
 module.exports = {
