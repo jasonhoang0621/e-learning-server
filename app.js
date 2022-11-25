@@ -5,7 +5,7 @@ const cors = require('cors')
 const routerCustom = require('./routes/index.js')
 const website = fs.readFileSync('view/index.html')
 const database = require('./utils/database')
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT || 3000
 
 const app = express()
 app.use(cors())
