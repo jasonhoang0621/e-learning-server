@@ -199,7 +199,7 @@ const googleOauth = async (req, res) => {
 }
 const verifyGoogle = async (req, res) => {
     try {
-        const code = req.query.code
+        const code = req.body.code
         const data = await userCol.getGoogleToken(code)
         const googleUser = await jwt.decodeToken(data.id_token)
         let user = await userCol.findOne(googleUser.email)

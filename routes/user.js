@@ -51,7 +51,7 @@ commands = [
     {
         name: 'verifyGoogle',
         controller: 'user',
-        method: 'get',
+        method: 'post',
         api: '/api/oauth/google',
         middleware: [],
     },
