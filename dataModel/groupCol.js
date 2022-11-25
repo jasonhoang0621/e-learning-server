@@ -24,6 +24,15 @@ async function addGroup(id, user) {
         .findOneAndUpdate({ id: id }, { $push: { members: user } })
     return result.value
 }
+async function update(code, data) {
+    const result = await database.groupModel().findOneAndUpdate(
+        { id: code },
+        {
+            $set: data,
+        }
+    )
+    return result.value
+}
 module.exports = {
     create,
     // validation,
@@ -31,4 +40,5 @@ module.exports = {
     createValidation,
     getAll,
     addGroup,
+    update,
 }
