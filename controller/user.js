@@ -244,7 +244,6 @@ const verifyGoogle = async (req, res) => {
 }
 const verifyEmail = async (req, res) => {
     const email = req.params.code
-    console.log(email)
     const user = await userCol.updateStatus(email)
     return res.redirect('http://localhost:4000/')
 }

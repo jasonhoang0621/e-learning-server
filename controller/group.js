@@ -10,11 +10,12 @@ const getAll = async (req, res) => {
         }
         const page = req.query.page ?? defaultPage
         const limit = req.query.limit ?? recordPerPage
-        let match = {}
+        const user = req.user
+        let match = {
+            'members.id': user.id,
+        }
         match['deletedAt'] = null
-        console.log(match)
         const data = await groupCol.getAll(page, limit, sortBy, match)
-        console.log('data', data)
         if (!data) {
             return res.json({
                 errorCode: true,
@@ -128,9 +129,68 @@ const remove = async (req, res) => {
     }
 }
 
+const assign = async (req, res) => {
+    try {
+        const user = req.user
+        const code = req.params.code
+        const body = req.body
+        let group = await groupCol.findOne(code)
+        if (!group) {
+            return res.json({ errorCode: true, data: 'Cannot find this group' })
+        }
+        let check = true
+        for (let i = 0; i < group.members.length; i++) {
+            if (group.members[i].id == user.id) {
+                if (group.members[i].role == 'owner') {
+                    check = true
+                    break
+                } else if (group.members[i].role == 'member') {
+                    check = false
+                    break
+                } else if (group.members[i].role == 'co-owner') {
+                    if (body.role == 'owner') {
+                        check = false
+                        break
+                    }
+                    for (let j = 0; j < group.members.length; j++) {
+                        if (
+                            group.members[j].role == 'owner' &&
+                            group.members[j].id == body.userId
+                        ) {
+                            check = false
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        if (!check) {
+            return res.json({
+                errorCode: true,
+                data: 'You dont have permission to assign this role to this people',
+            })
+        }
+        const temp = group.members.filter((e) => e.id !== body.userId)
+        group.members = temp
+        group.members.push({
+            id: body.userId,
+            role: body.role,
+        })
+        group['updatedAt'] = new Date()
+        const updated = await groupCol.update(code, group)
+        if (!updated) {
+            return res.json({ errorCode: true, data: 'System error' })
+        }
+        return res.json({ errorCode: null, data: 'Assign success' })
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'System error' })
+    }
+}
+
 module.exports = {
     getAll,
     getOne,
     create,
     remove,
+    assign,
 }

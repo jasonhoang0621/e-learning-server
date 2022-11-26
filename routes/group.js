@@ -27,5 +27,12 @@ commands = [
         api: '/api/group/:code',
         middleware: ['Authorization'],
     },
+    {
+        name: 'assign',
+        controller: 'group',
+        method: 'patch',
+        api: '/api/group/assign/:code',
+        middleware: ['Authorization'],
+    },
 ]
 module.exports = commands

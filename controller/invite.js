@@ -13,7 +13,6 @@ async function create(req, res) {
 
         const user = req.user
         for (property of inviteCol.createValidation) {
-            console.log(property)
             if (data[property] === undefined) {
                 return res.json({
                     errorCode: true,
@@ -21,10 +20,10 @@ async function create(req, res) {
                 })
             }
         }
-        if (data.isEmail && !data.memberId) {
+        if (data.isEmail && !data.memberEmail) {
             return res.json({
                 errorCode: true,
-                data: `Please input memberId`,
+                data: `Please input member's email`,
             })
         }
         const checkOwner = await groupCol.findOne(groupId)
@@ -44,9 +43,20 @@ async function create(req, res) {
         data.createdAt = new Date()
         let member = null
         if (data.isEmail) {
-            member = await userCol.findOneById(data.memberId)
-            console.log('member', member)
-            await emailCol.sendEmailInvite(member.email, data.id, data.memberId)
+            member = await userCol.findOne(data.memberEmail)
+            let checkExist = false
+            checkOwner.members.map((item) => {
+                if (item.id === member.id || user.id === member.id) {
+                    checkExist = true
+                }
+            })
+            if (checkExist) {
+                return res.json({
+                    errorCode: true,
+                    data: 'This person has been already in this group',
+                })
+            }
+            await emailCol.sendEmailInvite(member.email, data.id, member.id)
         } else {
             data.member = null
         }
