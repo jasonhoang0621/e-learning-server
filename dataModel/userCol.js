@@ -26,7 +26,7 @@ async function updateStatus(email) {
 }
 async function update(email, data) {
     data['updateAt'] = new Date()
-    const result = await database.groupModel().findOneAndUpdate(
+    const result = await database.userModel().findOneAndUpdate(
         { email: email },
         {
             $set: data,

@@ -248,32 +248,41 @@ const verifyEmail = async (req, res) => {
     return res.redirect('http://localhost:4000/')
 }
 const changePass = async (req, res) => {
-    const user = req.user
-    let body = req.body
-    const data = await userCol.getDetailByEmail(user.email)
-    if (!data) {
-        return res.json({ errorCode: true, data: 'No User' })
-    }
-    const checkPass = await bcrypt.compare(body.oldPassword, data.password)
-    if (!checkPass) {
-        return res.json({ errorCode: true, data: 'Wrong password' })
-    }
-    if (body.password !== body.rePassword) {
-        return res.json({ errorCode: true, data: 'Confirm password not match' })
-    }
-    delete body.rePassword
-    const password = await bcrypt.hash(body.password, saltRounds)
-    body.password = password
-    const update = await userCol.update(email, body)
-    if (!update) {
-        return res.json({ errorCode: true, data: 'Update fail' })
-    }
-    for (property of userCol.userProperties) {
-        if (req.body[property]) {
-            update[property] = req.body[property]
+    try {
+        const user = req.user
+        let body = req.body
+        const data = await userCol.getDetailByEmail(user.email)
+        if (!data) {
+            return res.json({ errorCode: true, data: 'No User' })
         }
+        const checkPass = await bcrypt.compare(body.password, data.password)
+        if (!checkPass) {
+            return res.json({ errorCode: true, data: 'Wrong password' })
+        }
+        if (body.newPassword !== body.rePassword) {
+            return res.json({
+                errorCode: true,
+                data: 'Confirm password not match',
+            })
+        }
+        delete body.rePassword
+        const password = await bcrypt.hash(body.newPassword, saltRounds)
+        body.password = password
+        delete body.newPassword
+        const update = await userCol.update(user.email, body)
+        if (!update) {
+            return res.json({ errorCode: true, data: 'Update fail' })
+        }
+        for (property of userCol.userProperties) {
+            if (req.body[property]) {
+                update[property] = req.body[property]
+            }
+        }
+        delete update.password
+        return res.json({ errorCode: null, data: update })
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'system error' })
     }
-    return res.json({ errorCode: null, data: update })
 }
 
 const update = async (req, res) => {
