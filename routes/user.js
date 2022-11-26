@@ -16,7 +16,7 @@ commands = [
     {
         name: 'getAll',
         controller: 'user',
-        method: 'post',
+        method: 'get',
         api: '/api/user',
         middleware: [],
     },

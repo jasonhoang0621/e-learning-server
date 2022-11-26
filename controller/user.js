@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt')
 const ObjectID = require('mongodb').ObjectId
 const emailCol = require('../utils/email.js')
 const saltRounds = 10
+const recordPerPage = 100
+const defaultPage = 1
 async function login(req, res) {
     try {
         const user = await database
@@ -311,6 +313,7 @@ const getAll = async (req, res) => {
         const limit = req.query.limit ?? recordPerPage
         let match = {}
         match['deletedAt'] = null
+        console.log('match', match)
         const data = await userCol.getAll(page, limit, sortBy, match)
         if (!data) {
             return res.json({
