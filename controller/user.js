@@ -313,7 +313,6 @@ const getAll = async (req, res) => {
         const limit = req.query.limit ?? recordPerPage
         let match = {}
         match['deletedAt'] = null
-        console.log('match', match)
         const data = await userCol.getAll(page, limit, sortBy, match)
         if (!data) {
             return res.json({

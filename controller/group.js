@@ -43,9 +43,14 @@ const getOne = async (req, res) => {
             return res.json({ errorCode: true, data: 'Cannot find this group' })
         }
         result.user = await hideUserInfo(result.user)
-        result.user.forEach((item, index) => {
-            item.role = result.members[index].role
-        })
+        const temp = result.members
+        for (let i = 0; i < result.user.length; i++) {
+            for (let j = 0; j < temp.length; j++) {
+                if (temp[j].id === result.user[i].id) {
+                    result.user[i].role = temp[j].role
+                }
+            }
+        }
         delete result.members
         return res.json({ errorCode: null, data: result })
     } catch (error) {

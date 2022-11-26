@@ -98,6 +98,26 @@ const joinGroupByEmail = async (req, res) => {
                 data: 'Cannot find the invitation',
             })
         }
+        const group = await groupCol.findOne(invite.groupId)
+        if (!group) {
+            return res.json({
+                errorCode: true,
+                data: 'Cannot find this group',
+            })
+        } else {
+            let check = false
+            group.members.map((item) => {
+                if (item.id === userId) {
+                    check = true
+                }
+            })
+            if (check) {
+                return res.json({
+                    errorCode: true,
+                    data: 'You have already joined this group',
+                })
+            }
+        }
         let result = await groupCol.addGroup(invite.groupId, data)
         result.members.push(data)
         return res.redirect(`http://localhost:4000/group/${invite.groupId}`)
