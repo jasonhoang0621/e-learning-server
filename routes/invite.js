@@ -17,7 +17,7 @@ commands = [
         name: 'joinGroup',
         controller: 'invite',
         method: 'post',
-        api: '/api/invite/:code',
+        api: '/api/invite/accept/:code',
         middleware: ['Authorization'],
     },
 ]
