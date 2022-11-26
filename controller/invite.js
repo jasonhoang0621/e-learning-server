@@ -20,7 +20,7 @@ async function create(req, res) {
                 })
             }
         }
-        if (data.isEmail && !data.memberEmail) {
+        if (data.isEmail && data.memberEmail.length <= 0) {
             return res.json({
                 errorCode: true,
                 data: `Please input member's email`,
@@ -43,20 +43,22 @@ async function create(req, res) {
         data.createdAt = new Date()
         let member = null
         if (data.isEmail) {
-            member = await userCol.findOne(data.memberEmail)
-            let checkExist = false
-            checkOwner.members.map((item) => {
-                if (item.id === member.id || user.id === member.id) {
-                    checkExist = true
-                }
-            })
-            if (checkExist) {
-                return res.json({
-                    errorCode: true,
-                    data: 'This person has been already in this group',
+            for (let i = 0; i < data.memberEmail.length; i++) {
+                member = await userCol.findOne(data.memberEmail[i])
+                let checkExist = false
+                checkOwner.members.map((item) => {
+                    if (item.id === member.id || user.id === member.id) {
+                        checkExist = true
+                    }
                 })
+                if (checkExist) {
+                    return res.json({
+                        errorCode: true,
+                        data: 'This person has been already in this group',
+                    })
+                }
+                await emailCol.sendEmailInvite(member.email, data.id, member.id)
             }
-            await emailCol.sendEmailInvite(member.email, data.id, member.id)
         } else {
             data.member = null
         }
