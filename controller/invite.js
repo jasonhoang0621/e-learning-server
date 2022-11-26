@@ -100,7 +100,7 @@ const joinGroupByEmail = async (req, res) => {
         }
         let result = await groupCol.addGroup(invite.groupId, data)
         result.members.push(data)
-        return res.redirect('https://group-user.onrender.com/')
+        return res.redirect(`http://localhost:4000/group/${invite.groupId}`)
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })
     }

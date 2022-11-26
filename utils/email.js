@@ -66,7 +66,7 @@ const sendEmailInvite = async (email, inviteId, userId) => {
             to: email,
             subject: 'Hello User 🚀',
             text: 'This email is sent from the command line',
-            html: `<p>🙋🏻‍♀️ This is a <b>invitation email</b> Please click to this link to join our group <a href="http://localhost:4000/api/emailInvited/${inviteId}?userId=${userId}">Join Group</a>.</p>`,
+            html: `<p>🙋🏻‍♀️ This is a <b>invitation email</b> Please click to this link to join our group <a href="http://localhost:3000/api/emailInvited/${inviteId}?userId=${userId}">Join Group</a>.</p>`,
         }
         const result = await transport.sendMail(options)
         console.log('result', result)
