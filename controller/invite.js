@@ -12,14 +12,6 @@ async function create(req, res) {
         data.groupId = groupId
 
         const user = req.user
-        for (property of inviteCol.createValidation) {
-            if (data[property] === undefined) {
-                return res.json({
-                    errorCode: true,
-                    data: `Please input ${property}`,
-                })
-            }
-        }
         if (data.isEmail && !data.memberEmail) {
             return res.json({
                 errorCode: true,
