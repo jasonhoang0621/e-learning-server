@@ -139,6 +139,12 @@ const assign = async (req, res) => {
         const user = req.user
         const code = req.params.code
         const body = req.body
+        if (user.id === body.userId) {
+            return res.json({
+                errorCode: true,
+                data: 'You cannot assign yourself',
+            })
+        }
         let group = await groupCol.findOne(code)
         if (!group) {
             return res.json({ errorCode: true, data: 'Cannot find this group' })
