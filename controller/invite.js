@@ -80,10 +80,9 @@ const joinGroup = async (req, res) => {
         }
         for (let i = 0; i < group.members.length; i++) {
             if (group.members[i].id === user.id) {
-                return res.json({
-                    errorCode: true,
-                    data: 'You have already joined this group',
-                })
+                return res.redirect(
+                    `https://group-user.netlify.app/group/${invite.groupId}`
+                )
             }
         }
         let result = await groupCol.addGroup(invite.groupId, data)
@@ -124,10 +123,9 @@ const joinGroupByEmail = async (req, res) => {
                 }
             })
             if (check) {
-                return res.json({
-                    errorCode: true,
-                    data: 'You have already joined this group',
-                })
+                return res.redirect(
+                    `https://group-user.netlify.app/group/${invite.groupId}`
+                )
             }
         }
         let result = await groupCol.addGroup(invite.groupId, data)
