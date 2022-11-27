@@ -101,6 +101,7 @@ async function profile(req, res) {
         if (!user) {
             return res.status(401).json({ errorCode: true, data: 'No User' })
         }
+        user.token = await jwt.createSecretKey({ email: req.body.email })
         delete user.password
         return res.json({ errorCode: null, data: user })
     } catch (error) {
