@@ -78,12 +78,17 @@ const joinGroup = async (req, res) => {
         if (!group) {
             return res.json({ errorCode: true, data: 'Cannot find this group' })
         }
+        let check = false
         for (let i = 0; i < group.members.length; i++) {
             if (group.members[i].id === user.id) {
-                return res.redirect(
-                    `https://group-user.netlify.app/group/${invite.groupId}`
-                )
+                check = true
             }
+        }
+        if (check) {
+            return res.json({
+                errorCode: true,
+                data: 'You are already in group',
+            })
         }
         let result = await groupCol.addGroup(invite.groupId, data)
         result.members.push(data)
