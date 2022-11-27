@@ -15,7 +15,12 @@ async function login(req, res) {
         if (!user) {
             return res
                 .status(400)
-                .json({ errorCode: true, data: 'Wrong email or password' })
+                .json({ errorCode: true, data: 'Cannot find this account' })
+        }
+        if (!user.email_verified) {
+            return res
+                .status(400)
+                .json({ errorCode: true, data: 'Please verify your email' })
         }
         const checkPass = await bcrypt.compare(req.body.password, user.password)
         if (!checkPass) {
