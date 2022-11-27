@@ -74,7 +74,7 @@ async function create(req, res) {
         }
         data.createdBy = user.id
         data.createdAt = new Date()
-        data.members = [user.id]
+        data.members = [{ id: user.id, role: 'owner' }]
         const group = await groupCol.create(data)
         if (!group) {
             return res.json({ errorCode: true, data: 'System error' })
