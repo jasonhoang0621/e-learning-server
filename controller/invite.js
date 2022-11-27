@@ -74,6 +74,18 @@ const joinGroup = async (req, res) => {
                 data: 'Cannot find the invitation',
             })
         }
+        const group = await groupCol.findOne(invite.groupId)
+        if (!group) {
+            return res.json({ errorCode: true, data: 'Cannot find this group' })
+        }
+        for (let i = 0; i < group.members.length; i++) {
+            if (group.members[i].id === user.id) {
+                return res.json({
+                    errorCode: true,
+                    data: 'You have already joined this group',
+                })
+            }
+        }
         let result = await groupCol.addGroup(invite.groupId, data)
         result.members.push(data)
         return res.json({ errorCode: null, data: result })
@@ -120,7 +132,9 @@ const joinGroupByEmail = async (req, res) => {
         }
         let result = await groupCol.addGroup(invite.groupId, data)
         result.members.push(data)
-        return res.redirect(`http://localhost:4000/group/${invite.groupId}`)
+        return res.redirect(
+            `https://group-user.netlify.app/group/${invite.groupId}`
+        )
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })
     }

@@ -28,7 +28,7 @@ const sendEmail = async (email) => {
             to: email,
             subject: 'Hello User 🚀',
             text: 'This email is sent from the command line',
-            html: `<p>🙋🏻‍♀️ This is a <b>verified email</b> Please click to this link to active your email <a href="http://localhost:4000/api/verifyEmail/${email}">Active Email</a>.</p>`,
+            html: `<p>🙋🏻‍♀️ This is a <b>verified email</b> Please click to this link to active your email <a href="https://group-user-server.onrender.com/api/verifyEmail/${email}">Active Email</a>.</p>`,
         }
         const result = await transport.sendMail(options)
         return true
@@ -65,7 +65,7 @@ const sendEmailInvite = async (email, inviteId, userId) => {
             to: email,
             subject: 'Hello User 🚀',
             text: 'This email is sent from the command line',
-            html: `<p>🙋🏻‍♀️ This is a <b>invitation email</b> Please click to this link to join our group <a href="http://localhost:3000/api/emailInvited/${inviteId}?userId=${userId}">Join Group</a>.</p>`,
+            html: `<p>🙋🏻‍♀️ This is a <b>invitation email</b> Please click to this link to join our group <a href="https://group-user-server.onrender.com/api/emailInvited/${inviteId}?userId=${userId}">Join Group</a>.</p>`,
         }
         const result = await transport.sendMail(options)('result', result)
         return true
