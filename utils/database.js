@@ -4,6 +4,7 @@ const config = require('../config/database.json')
 let _userModel = null
 let _groupModel = null
 let _inviteModel = null
+let _slideModel = null
 
 async function connectDatabase(callback) {
     const client = new MongoClient(config.uri)
@@ -15,6 +16,7 @@ async function connectDatabase(callback) {
         _userModel = db.collection('user')
         _groupModel = db.collection('group')
         _inviteModel = db.collection('invite')
+        _slideModel = db.collection('slide')
 
         callback()
     } catch (e) {
@@ -45,9 +47,18 @@ const inviteModel = function () {
     }
 }
 
+const slideModel = function () {
+    if (_slideModel == null) {
+        console.log('Instance is null or undefined')
+    } else {
+        return _slideModel
+    }
+}
+
 module.exports = {
     userModel,
     groupModel,
     inviteModel,
+    slideModel,
     connectDatabase,
 }

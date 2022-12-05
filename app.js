@@ -2,9 +2,11 @@ const createError = require('http-errors')
 const express = require('express')
 const fs = require('fs')
 const cors = require('cors')
+const http = require('http')
 const routerCustom = require('./routes/index.js')
 const website = fs.readFileSync('view/index.html')
 const database = require('./utils/database')
+const { Server } = require('socket.io')
 const PORT = process.env.PORT || 3000
 
 const app = express()
@@ -43,7 +45,22 @@ app.use(function (err, req, res, next) {
     res.render('error')
 })
 
-app.listen(PORT, function () {
+const server = http.createServer(app)
+
+const io = new Server(server, {
+    cors: {
+        origin: '*',
+        methods: 'GET,POST',
+    },
+})
+
+io.on('connection', (socket) => {
+    console.log('User connected')
+    require('./socket/socket.js')(socket)
+    return io
+})
+
+server.listen(PORT, function () {
     console.log('Begin listen on port %s...', PORT)
 })
 module.exports = app

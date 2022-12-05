@@ -1,12 +1,14 @@
 const userCommand = require('./user.js')
 const groupCommand = require('./group.js')
 const inviteCommand = require('./invite.js')
+const slideCommand = require('./slide.js')
 
-const event = [userCommand, groupCommand, inviteCommand]
+const event = [userCommand, groupCommand, inviteCommand, slideCommand]
 const controllers = {
     user: require('../controller/user.js'),
     group: require('../controller/group.js'),
     invite: require('../controller/invite.js'),
+    slide: require('../controller/slide.js'),
 }
 
 const middleWares = {
