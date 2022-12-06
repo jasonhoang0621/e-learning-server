@@ -1,7 +1,8 @@
 const slideCol = require('../dataModel/slideCol')
 const ObjectID = require('mongodb').ObjectId
 const groupCol = require('../dataModel/groupCol')
-
+const recordPerPage = 100
+const defaultPage = 1
 async function create(req, res) {
     try {
         let data = req.body
@@ -59,8 +60,36 @@ const getOne = async (req, res) => {
         return res.json({ errorCode: true, data: 'system error' })
     }
 }
-
+const getAll = async (req, res) => {
+    try {
+        const sortBy = {
+            createdAt: -1,
+        }
+        const page = req.query.page ?? defaultPage
+        const limit = req.query.limit ?? recordPerPage
+        match['deletedAt'] = null
+        const data = await slideCol.getAll(page, limit, sortBy, match)
+        if (!data) {
+            return res.json({
+                errorCode: true,
+                data: 'System error',
+                metadata: {
+                    recordTotal: 0,
+                    pageCurrent: page,
+                    recordPerPage: limit,
+                },
+            })
+        }
+        return res.json({
+            errorCode: null,
+            data: data,
+        })
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'system error' })
+    }
+}
 module.exports = {
     create,
     getOne,
+    getAll,
 }

@@ -13,5 +13,12 @@ commands = [
         api: '/api/slide/:code',
         middleware: [],
     },
+    {
+        name: 'getAll',
+        controller: 'slide',
+        method: 'get',
+        api: '/api/slide',
+        middleware: [],
+    },
 ]
 module.exports = commands
