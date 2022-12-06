@@ -38,8 +38,8 @@ async function create(req, res) {
             }
         }
         data.createdBy = user.id
-        const slide = await presentationCol.create(data)
-        if (!slide) {
+        const presentation = await presentationCol.create(data)
+        if (!presentation) {
             return res.json({ errorCode: true, data: 'System error' })
         }
         return res.json({ errorCode: null, data: data })

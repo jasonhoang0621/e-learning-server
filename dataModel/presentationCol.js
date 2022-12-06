@@ -1,6 +1,6 @@
 const database = require('../utils/database')
 const { dataPagination } = require('../helperFunction/helper')
-const createValidation = ['question', 'answer', 'presentationId', 'index']
+const createValidation = ['groupId', 'name']
 async function create(data) {
     return await database.presentationModel().insertOne(data)
 }

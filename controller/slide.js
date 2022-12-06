@@ -61,6 +61,13 @@ const getAll = async (req, res) => {
         const page = req.query.page ?? defaultPage
         const limit = req.query.limit ?? recordPerPage
         match['deletedAt'] = null
+        if (req.query.filters) {
+            if (filters['presentationId'] !== undefined) {
+                match['presentationId'] = {
+                    $eq: filters['presentationId'],
+                }
+            }
+        }
         const data = await slideCol.getAll(page, limit, sortBy, match)
         if (!data) {
             return res.json({
