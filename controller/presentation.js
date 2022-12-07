@@ -1,6 +1,7 @@
 const presentationCol = require('../dataModel/presentationCol')
 const ObjectID = require('mongodb').ObjectId
 const groupCol = require('../dataModel/groupCol')
+const { joinSlide } = require('../helperFunction/helper')
 const recordPerPage = 100
 const defaultPage = 1
 async function create(req, res) {
@@ -51,11 +52,26 @@ async function create(req, res) {
 const getOne = async (req, res) => {
     try {
         const id = req.params.code
-        let result = await presentationCol.findOne(id)
+        const user = req.user
+        let result = await presentationCol.findOne(id, joinSlide())
         if (!result) {
             return res.json({
                 errorCode: true,
                 data: 'Cannot find this presentation',
+            })
+        }
+        const group = await groupCol.findOne(result.groupId)
+        let check = false
+        for (let i = 0; i < group.members.length; i++) {
+            if (group.members[i].id == user.id) {
+                check = true
+                break
+            }
+        }
+        if (!check) {
+            return res.json({
+                errorCode: true,
+                data: `You don't have permission to view this group`,
             })
         }
         return res.json({ errorCode: null, data: result })
@@ -68,9 +84,35 @@ const getAll = async (req, res) => {
         const sortBy = {
             createdAt: -1,
         }
-        const page = req.query.page ?? defaultPage
-        const limit = req.query.limit ?? recordPerPage
+        const page = req.query?.page ?? defaultPage
+        const limit = req.query?.limit ?? recordPerPage
+        const user = req.user
+        let match = {
+            groupId: '',
+        }
+
         match['deletedAt'] = null
+        if (req.query.filters) {
+            filters = req.query.filters
+            if (filters['groupId']) {
+                const groupId = filters['groupId']
+                const group = await groupCol.findOne(groupId)
+                let check = false
+                for (let i = 0; i < group.members.length; i++) {
+                    if (group.members[i].id == user.id) {
+                        check = true
+                        break
+                    }
+                }
+                if (!check) {
+                    return res.json({
+                        errorCode: true,
+                        data: `You don't have permission to view this group`,
+                    })
+                }
+                match['groupId'] = filters['groupId']
+            }
+        }
         const data = await presentationCol.getAll(page, limit, sortBy, match)
         if (!data) {
             return res.json({
@@ -91,8 +133,85 @@ const getAll = async (req, res) => {
         return res.json({ errorCode: true, data: 'system error' })
     }
 }
+
+async function update(req, res) {
+    try {
+        let data = req.body
+        const code = req.params.code
+        const user = req.user
+        const group = await groupCol.findOne(data?.groupId ?? '')
+        if (!group) {
+            return res.json({ errorCode: true, data: 'Cannot find this group' })
+        }
+        let check = false
+        for (let i = 0; i < group.members.length; i++) {
+            if (
+                group.members[i].id == user.id &&
+                group.members[i].role == 'owner'
+            ) {
+                check = true
+                break
+            }
+        }
+        if (!check) {
+            return res.json({
+                errorCode: true,
+                data: `You don't have permission to create slide in this group`,
+            })
+        }
+
+        data['updatedAt'] = new Date()
+        const presentation = await presentationCol.update(code, data)
+        if (!presentation) {
+            return res.json({ errorCode: true, data: 'System error' })
+        }
+        return res.json({ errorCode: null, data: data })
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'system error' })
+    }
+}
+
+async function destroy(req, res) {
+    try {
+        let data = req.body
+        const code = req.params.code
+        const user = req.user
+        const group = await groupCol.findOne(data?.groupId ?? '')
+        if (!group) {
+            return res.json({ errorCode: true, data: 'Cannot find this group' })
+        }
+        let check = false
+        for (let i = 0; i < group.members.length; i++) {
+            if (
+                group.members[i].id == user.id &&
+                group.members[i].role == 'owner'
+            ) {
+                check = true
+                break
+            }
+        }
+        if (!check) {
+            return res.json({
+                errorCode: true,
+                data: `You don't have permission to create slide in this group`,
+            })
+        }
+        data['deletedAt'] = new Date()
+        console.log('data', data)
+        const presentation = await presentationCol.update(code, data)
+        if (!presentation) {
+            return res.json({ errorCode: true, data: 'System error' })
+        }
+        return res.json({ errorCode: null, data: data })
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'system error' })
+    }
+}
+
 module.exports = {
     create,
     getOne,
     getAll,
+    update,
+    destroy,
 }

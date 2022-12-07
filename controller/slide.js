@@ -1,6 +1,7 @@
 const slideCol = require('../dataModel/slideCol')
 const ObjectID = require('mongodb').ObjectId
 const presentationCol = require('../dataModel/presentationCol')
+const groupCol = require('../dataModel/groupCol')
 const recordPerPage = 100
 const defaultPage = 1
 async function create(req, res) {
@@ -15,6 +16,20 @@ async function create(req, res) {
                 errorCode: true,
                 data: 'Cannot find this presentation',
             })
+        }
+        const group = await groupCol.findOne(presentation.groupId)
+        if (!group) {
+            return res.json({ errorCode: true, data: 'Cannot find this group' })
+        }
+        let check = false
+        for (let i = 0; i < group.members.length; i++) {
+            if (
+                group.members[i].id == user.id &&
+                group.members[i].role == 'owner'
+            ) {
+                check = true
+                break
+            }
         }
         if (!check) {
             return res.json({
@@ -31,6 +46,7 @@ async function create(req, res) {
             }
         }
         data.createdBy = user.id
+        data.createdAt = new Date()
         const slide = await slideCol.create(data)
         if (!slide) {
             return res.json({ errorCode: true, data: 'System error' })

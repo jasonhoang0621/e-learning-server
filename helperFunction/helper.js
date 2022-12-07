@@ -32,6 +32,19 @@ function joinUser(aggregate = []) {
     })
     return aggregate
 }
+
+function joinSlide(aggregate = []) {
+    aggregate.push({
+        $lookup: {
+            from: 'slide',
+            localField: 'id',
+            foreignField: 'presentationId',
+            as: 'slide',
+        },
+    })
+    return aggregate
+}
+
 function hideUserInfo(users) {
     for (let i = 0; i < users.length; i++) {
         delete users[i].password
@@ -43,4 +56,5 @@ module.exports = {
     dataPagination,
     joinUser,
     hideUserInfo,
+    joinSlide,
 }
