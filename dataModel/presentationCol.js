@@ -12,10 +12,10 @@ async function findOne(id, join = []) {
     return result[0]
 }
 
-async function getAll(sort, page, limit, match = {}) {
+async function getAll(page, limit, sort, match = {}, join = false) {
     let pipeline = null
+    pipeline = dataPagination(match, sort, page, limit, join)
 
-    pipeline = dataPagination(match, sort, page, limit)
     const result = await database
         .presentationModel()
         .aggregate(pipeline)

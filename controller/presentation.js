@@ -129,7 +129,13 @@ const getAll = async (req, res) => {
                 match['groupId'] = filters['groupId']
             }
         }
-        const data = await presentationCol.getAll(page, limit, sortBy, match)
+        const data = await presentationCol.getAll(
+            page,
+            limit,
+            sortBy,
+            match,
+            joinSlide()
+        )
         if (!data) {
             return res.json({
                 errorCode: true,
@@ -143,7 +149,8 @@ const getAll = async (req, res) => {
         }
         return res.json({
             errorCode: null,
-            data: data,
+            metadata: data[0].metadata[0],
+            data: data[0].data,
         })
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })
@@ -155,6 +162,9 @@ async function update(req, res) {
         let data = req.body
         const code = req.params.code
         const user = req.user
+        if (!data.groupId) {
+            return res.json({ errorCode: true, data: 'Please input groupId' })
+        }
         const group = await groupCol.findOne(data?.groupId ?? '')
         if (!group) {
             return res.json({ errorCode: true, data: 'Cannot find this group' })
@@ -192,6 +202,9 @@ async function destroy(req, res) {
         let data = req.body
         const code = req.params.code
         const user = req.user
+        if (!data.groupId) {
+            return res.json({ errorCode: true, data: 'Please input groupId' })
+        }
         const group = await groupCol.findOne(data?.groupId ?? '')
         if (!group) {
             return res.json({ errorCode: true, data: 'Cannot find this group' })
@@ -213,7 +226,6 @@ async function destroy(req, res) {
             })
         }
         data['deletedAt'] = new Date()
-        console.log('data', data)
         const presentation = await presentationCol.update(code, data)
         if (!presentation) {
             return res.json({ errorCode: true, data: 'System error' })

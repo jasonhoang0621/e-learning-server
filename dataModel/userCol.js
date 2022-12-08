@@ -61,7 +61,7 @@ async function findOne(email) {
 async function findOneById(id) {
     return await database.userModel().findOne({ id: id })
 }
-async function getAll(sort, page, limit, match = {}) {
+async function getAll(page, limit, sort, match = {}) {
     let pipeline = null
 
     pipeline = dataPagination(match, sort, page, limit)

@@ -98,7 +98,8 @@ const getAll = async (req, res) => {
         }
         return res.json({
             errorCode: null,
-            data: data,
+            metadata: data[0].metadata[0],
+            data: data[0].data,
         })
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })

@@ -4,7 +4,7 @@ const createValidation = ['name']
 async function create(data) {
     return await database.groupModel().insertOne(data)
 }
-async function getAll(sort, page, limit, match = {}) {
+async function getAll(page, limit, sort, match = {}) {
     let pipeline = null
 
     pipeline = dataPagination(match, sort, page, limit)

@@ -8,7 +8,7 @@ async function findOne(id) {
     return await database.slideModel().findOne({ id: id })
 }
 
-async function getAll(sort, page, limit, match = {}) {
+async function getAll(page, limit, sort, match = {}) {
     let pipeline = null
 
     pipeline = dataPagination(match, sort, page, limit)

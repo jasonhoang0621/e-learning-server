@@ -11,14 +11,14 @@ function dataPagination(match, sort, page = 1, limit = 10, join = false) {
     if (join) {
         join.forEach((item) => data.push(item))
     }
-    // let facet = {
-    //     metadata: [
-    //         { $count: 'recordTotal' },
-    //         { $addFields: { pageCurrent: page, recordPerPage: limit } },
-    //     ],
-    //     data: data,
-    // }
-    // aggregate.push({ $facet: facet })
+    let facet = {
+        metadata: [
+            { $count: 'recordTotal' },
+            { $addFields: { pageCurrent: page, recordPerPage: limit } },
+        ],
+        data: data,
+    }
+    aggregate.push({ $facet: facet })
     return aggregate
 }
 function joinUser(aggregate = []) {
@@ -34,11 +34,20 @@ function joinUser(aggregate = []) {
 }
 
 function joinSlide(aggregate = []) {
+    const project = {
+        id: 1,
+        groupId: 1,
+        name: 1,
+        presentationId: 1,
+        createdAt: 1,
+        index: 1,
+    }
     aggregate.push({
         $lookup: {
             from: 'slide',
             localField: 'id',
             foreignField: 'presentationId',
+            pipeline: [{ $project: project }, { $sort: { index: 1 } }],
             as: 'slide',
         },
     })
