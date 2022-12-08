@@ -1,4 +1,5 @@
 const presentationCol = require('../dataModel/presentationCol')
+const chatCol = require('../dataModel/chatCol')
 const ObjectID = require('mongodb').ObjectId
 const groupCol = require('../dataModel/groupCol')
 const { joinSlide } = require('../helperFunction/helper')
@@ -39,9 +40,24 @@ async function create(req, res) {
             }
         }
         data.createdBy = user.id
+        data.createdAt = new Date()
         const presentation = await presentationCol.create(data)
         if (!presentation) {
-            return res.json({ errorCode: true, data: 'System error' })
+            return res.json({
+                errorCode: true,
+                data: 'Cannot create presentation',
+            })
+        }
+        const chatData = {
+            id: ObjectID().toString(),
+            presentationId: data.id,
+            groupId: data.groupId,
+            createdBy: user.id,
+            createdAt: new Date(),
+        }
+        const chat = await chatCol.create(chatData)
+        if (!chat) {
+            return res.json({ errorCode: true, data: 'Cannot create chat' })
         }
         return res.json({ errorCode: null, data: data })
     } catch (error) {
