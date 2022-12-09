@@ -41,6 +41,8 @@ function joinSlide(aggregate = []) {
         presentationId: 1,
         createdAt: 1,
         index: 1,
+        question: 1,
+        answer: 1,
     }
     aggregate.push({
         $lookup: {
