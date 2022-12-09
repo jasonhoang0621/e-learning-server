@@ -105,8 +105,19 @@ const getAll = async (req, res) => {
         return res.json({ errorCode: true, data: 'system error' })
     }
 }
+const answer = async (req, res) => {
+    const id = req.params.code
+    const body = req.body
+    const updated = await slideCol.answer(id, body.index)
+    if (!updated) {
+        return res.json({ errorCode: true, data: 'System error' })
+    } else {
+        return res.json({ errorCode: null, data: updated })
+    }
+}
 module.exports = {
     create,
     getOne,
     getAll,
+    answer,
 }

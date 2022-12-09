@@ -15,6 +15,20 @@ async function getAll(page, limit, sort, match = {}) {
     const result = await database.slideModel().aggregate(pipeline).toArray()
     return result
 }
+async function answer(id, index) {
+    const result = await database.slideModel().findOneAndUpdate(
+        { id: id },
+        {
+            $inc: {
+                [`answer.${index}.amount`]: 1,
+            },
+            $set: {
+                updatedAt: new Date(),
+            },
+        }
+    )
+    return result.value
+}
 
 module.exports = {
     create,
@@ -22,4 +36,5 @@ module.exports = {
     createValidation,
     findOne,
     getAll,
+    answer,
 }

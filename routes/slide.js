@@ -7,9 +7,16 @@ commands = [
         middleware: ['Authorization'],
     },
     {
-        name: 'getOne',
+        name: 'answer',
         controller: 'slide',
         method: 'post',
+        api: '/api/slide/:code',
+        middleware: ['Authorization'],
+    },
+    {
+        name: 'getOne',
+        controller: 'slide',
+        method: 'get',
         api: '/api/slide/:code',
         middleware: ['Authorization'],
     },
