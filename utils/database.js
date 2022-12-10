@@ -4,7 +4,6 @@ const config = require('../config/database.json')
 let _userModel = null
 let _groupModel = null
 let _inviteModel = null
-let _slideModel = null
 let _presentationModel = null
 let _chatModel = null
 let _messageModel = null
@@ -19,7 +18,6 @@ async function connectDatabase(callback) {
         _userModel = db.collection('user')
         _groupModel = db.collection('group')
         _inviteModel = db.collection('invite')
-        _slideModel = db.collection('slide')
         _presentationModel = db.collection('presentation')
         _chatModel = db.collection('chat')
         _messageModel = db.collection('message')
@@ -53,14 +51,6 @@ const inviteModel = function () {
     }
 }
 
-const slideModel = function () {
-    if (_slideModel == null) {
-        console.log('Instance is null or undefined')
-    } else {
-        return _slideModel
-    }
-}
-
 const presentationModel = function () {
     if (_presentationModel == null) {
         console.log('Instance is null or undefined')
@@ -89,7 +79,6 @@ module.exports = {
     userModel,
     groupModel,
     inviteModel,
-    slideModel,
     chatModel,
     messageModel,
     connectDatabase,

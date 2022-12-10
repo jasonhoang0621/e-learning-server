@@ -1,21 +1,13 @@
 const userCommand = require('./user.js')
 const groupCommand = require('./group.js')
 const inviteCommand = require('./invite.js')
-const slideCommand = require('./slide.js')
 const presentationCommand = require('./presentation.js')
 
-const event = [
-    userCommand,
-    groupCommand,
-    inviteCommand,
-    slideCommand,
-    presentationCommand,
-]
+const event = [userCommand, groupCommand, inviteCommand, presentationCommand]
 const controllers = {
     user: require('../controller/user.js'),
     group: require('../controller/group.js'),
     invite: require('../controller/invite.js'),
-    slide: require('../controller/slide.js'),
     presentation: require('../controller/presentation.js'),
 }
 

@@ -2,7 +2,6 @@ const presentationCol = require('../dataModel/presentationCol')
 const chatCol = require('../dataModel/chatCol')
 const ObjectID = require('mongodb').ObjectId
 const groupCol = require('../dataModel/groupCol')
-const { joinSlide } = require('../helperFunction/helper')
 const recordPerPage = 100
 const defaultPage = 1
 async function create(req, res) {
@@ -69,7 +68,7 @@ const getOne = async (req, res) => {
     try {
         const id = req.params.code
         const user = req.user
-        let result = await presentationCol.findOne(id, joinSlide())
+        let result = await presentationCol.findOne(id)
         if (!result) {
             return res.json({
                 errorCode: true,
@@ -129,13 +128,7 @@ const getAll = async (req, res) => {
                 match['groupId'] = filters['groupId']
             }
         }
-        const data = await presentationCol.getAll(
-            page,
-            limit,
-            sortBy,
-            match,
-            joinSlide()
-        )
+        const data = await presentationCol.getAll(page, limit, sortBy, match)
         if (!data) {
             return res.json({
                 errorCode: true,
@@ -230,6 +223,7 @@ async function destroy(req, res) {
         if (!presentation) {
             return res.json({ errorCode: true, data: 'System error' })
         }
+        await chatCol.destroy(presentation.id)
         return res.json({ errorCode: null, data: data })
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })

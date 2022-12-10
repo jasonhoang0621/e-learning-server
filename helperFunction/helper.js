@@ -33,29 +33,6 @@ function joinUser(aggregate = []) {
     return aggregate
 }
 
-function joinSlide(aggregate = []) {
-    const project = {
-        id: 1,
-        groupId: 1,
-        name: 1,
-        presentationId: 1,
-        createdAt: 1,
-        index: 1,
-        question: 1,
-        answer: 1,
-    }
-    aggregate.push({
-        $lookup: {
-            from: 'slide',
-            localField: 'id',
-            foreignField: 'presentationId',
-            pipeline: [{ $project: project }, { $sort: { index: 1 } }],
-            as: 'slide',
-        },
-    })
-    return aggregate
-}
-
 function hideUserInfo(users) {
     for (let i = 0; i < users.length; i++) {
         delete users[i].password
@@ -67,5 +44,4 @@ module.exports = {
     dataPagination,
     joinUser,
     hideUserInfo,
-    joinSlide,
 }
