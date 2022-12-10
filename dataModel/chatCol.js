@@ -9,6 +9,9 @@ async function findByPresentationId(id) {
 async function getOne(id) {
     return await database.chatModel().findOne({ id })
 }
+async function getOneByPresentationId(id) {
+    return await database.chatModel().findOne({ presentationId: id })
+}
 async function destroy(id) {
     return await database.chatModel().findOneAndUpdate(
         { id },
@@ -24,4 +27,5 @@ module.exports = {
     findByPresentationId,
     destroy,
     getOne,
+    getOneByPresentationId,
 }

@@ -7,25 +7,37 @@ const e = require('express')
 const ObjectID = require('mongodb').ObjectId
 
 const getUserInfo = async (token) => {
-    const verify = await jwt.verifyToken(token)
-    let user = []
-    user = await database.userModel().find({ email: verify?.email }).toArray()
+    try {
+        const verify = await jwt.verifyToken(token)
+        let user = []
+        user = await database
+            .userModel()
+            .find({ email: verify?.email })
+            .toArray()
 
-    if (user.length == 0 || user.length > 1) {
+        if (user.length == 0 || user.length > 1) {
+            return null
+        }
+        return user[0]
+    } catch (error) {
         return null
     }
-    return user[0]
 }
 module.exports = (socket) => {
     socket.on('present', async (data) => {
         const token = socket.handshake.headers.token
         const user = await getUserInfo(token)
+        if (!user) {
+            socket.emit('present', {
+                errorCode: true,
+                data: 'System error',
+            })
+            return
+        }
         const chat = await chatCol.findByPresentationId(data.presentationId)
         const presentation = await presentationCol.findOne(data.presentationId)
-        console.log(data)
         socket.on(`present-${data.presentationId}`, (data) => {
-            console.log('data')
-            const currentSlide = presentation.slide.map(
+            const currentSlide = presentation.slide.filter(
                 (item) => item.index === data.index
             )
             socket.broadcast.emit(
@@ -39,11 +51,12 @@ module.exports = (socket) => {
                 userId: user.id,
                 message: data.message,
                 chatId: chat.id,
+                createdAt: new Date(),
             }
             const result = await messageCol.create(newMessage)
             delete user.password
             delete user.refreshToken
-            newMessage.user = user
+            newMessage.user = [user]
             if (!result) {
                 socket.broadcast.emit(`chat-${data.presentationId}`, {
                     errorCode: true,

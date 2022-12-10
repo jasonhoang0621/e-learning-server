@@ -1,6 +1,5 @@
 const chatCol = require('../dataModel/chatCol')
 const messageCol = require('../dataModel/messageCol')
-
 const ObjectID = require('mongodb').ObjectId
 const {
     hideUserInfo,
@@ -14,26 +13,27 @@ const getOne = async (req, res) => {
             createdAt: -1,
         }
         const code = req.params.code
-        const page = req.query?.page ?? defaultPage
-        const limit = req.query?.limit ?? recordPerPage
+        let skip = req.query?.skip ?? 0
+        skip = parseInt(skip)
+        const limit = 10
         const user = req.user
-        let match = {
-            chatId: code,
-        }
 
-        match['deletedAt'] = null
-        const chat = await chatCol.getOne(code)
+        const chat = await chatCol.getOneByPresentationId(code)
         if (!chat) {
             return res.json({ errorCode: true, data: 'Cannot find this chat' })
         }
+        let match = {
+            chatId: chat.id,
+        }
+        match['deletedAt'] = null
+
         const message = await messageCol.getAll(
-            page,
+            skip,
             limit,
             sortBy,
             match,
             joinMessageWithUser()
         )
-        console.log(message[0].data[0].user)
         for (let i = 0; i < message[0].data.length; i++) {
             message[0].data[i].user = await hideUserInfo(
                 message[0].data[i].user
@@ -53,7 +53,7 @@ const getOne = async (req, res) => {
         return res.json({
             errorCode: null,
             metadata: message[0].metadata[0],
-            data: message[0].data,
+            data: message[0].data.reverse(),
         })
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })

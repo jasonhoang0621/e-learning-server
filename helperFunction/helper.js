@@ -21,6 +21,24 @@ function dataPagination(match, sort, page = 1, limit = 10, join = false) {
     aggregate.push({ $facet: facet })
     return aggregate
 }
+
+function dataPaginationSkip(match, sort, skip, limit, join = false) {
+    const aggregate = [{ $match: match }]
+    let data = []
+    data.push({ $sort: sort })
+    data.push({ $skip: skip })
+    data.push({ $limit: limit })
+
+    if (join) {
+        join.forEach((item) => data.push(item))
+    }
+    let facet = {
+        metadata: [{ $count: 'recordTotal' }],
+        data: data,
+    }
+    aggregate.push({ $facet: facet })
+    return aggregate
+}
 function joinUser(aggregate = []) {
     aggregate.push({
         $lookup: {
@@ -45,7 +63,6 @@ function joinMessageWithUser(aggregate = []) {
 }
 
 function hideUserInfo(users) {
-    console.log(users)
     for (let i = 0; i < users.length; i++) {
         delete users[i].password
         delete users[i].refreshToken
@@ -57,4 +74,5 @@ module.exports = {
     joinUser,
     hideUserInfo,
     joinMessageWithUser,
+    dataPaginationSkip,
 }
