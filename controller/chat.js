@@ -15,7 +15,7 @@ const getOne = async (req, res) => {
         const code = req.params.code
         let skip = req.query?.skip ?? 0
         skip = parseInt(skip)
-        const limit = 10
+        const limit = 20
         const user = req.user
 
         const chat = await chatCol.getOneByPresentationId(code)
