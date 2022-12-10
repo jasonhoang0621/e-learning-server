@@ -22,19 +22,28 @@ module.exports = (socket) => {
         const user = await getUserInfo(token)
         const chat = await chatCol.findByPresentationId(data.presentationId)
         const presentation = await presentationCol.findOne(data.presentationId)
-        console.log(presentation)
+        console.log(data)
         socket.on(`present-${data.presentationId}`, (data) => {
-            console.log(data)
-            socket.broadcast.emit(`present-${data.presentationId}`, data)
+            console.log('data')
+            const currentSlide = presentation.slide.map(
+                (item) => item.index === data.index
+            )
+            socket.broadcast.emit(
+                `present-${data.presentationId}`,
+                currentSlide
+            )
         })
         socket.on(`chat-${data.presentationId}`, async (data) => {
-            const newMessage = {
+            let newMessage = {
                 id: ObjectID().toString(),
                 userId: user.id,
                 message: data.message,
                 chatId: chat.id,
             }
             const result = await messageCol.create(newMessage)
+            delete user.password
+            delete user.refreshToken
+            newMessage.user = user
             if (!result) {
                 socket.broadcast.emit(`chat-${data.presentationId}`, {
                     errorCode: true,
