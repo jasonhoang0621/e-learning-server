@@ -32,8 +32,20 @@ function joinUser(aggregate = []) {
     })
     return aggregate
 }
+function joinMessageWithUser(aggregate = []) {
+    aggregate.push({
+        $lookup: {
+            from: 'user',
+            localField: 'userId',
+            foreignField: 'id',
+            as: 'user',
+        },
+    })
+    return aggregate
+}
 
 function hideUserInfo(users) {
+    console.log(users)
     for (let i = 0; i < users.length; i++) {
         delete users[i].password
         delete users[i].refreshToken
@@ -44,4 +56,5 @@ module.exports = {
     dataPagination,
     joinUser,
     hideUserInfo,
+    joinMessageWithUser,
 }

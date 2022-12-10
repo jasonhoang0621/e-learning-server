@@ -2,13 +2,21 @@ const userCommand = require('./user.js')
 const groupCommand = require('./group.js')
 const inviteCommand = require('./invite.js')
 const presentationCommand = require('./presentation.js')
+const chatCommand = require('./chat.js')
 
-const event = [userCommand, groupCommand, inviteCommand, presentationCommand]
+const event = [
+    userCommand,
+    groupCommand,
+    inviteCommand,
+    presentationCommand,
+    chatCommand,
+]
 const controllers = {
     user: require('../controller/user.js'),
     group: require('../controller/group.js'),
     invite: require('../controller/invite.js'),
     presentation: require('../controller/presentation.js'),
+    chat: require('../controller/chat.js'),
 }
 
 const middleWares = {
