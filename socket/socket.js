@@ -24,50 +24,58 @@ const getUserInfo = async (token) => {
     }
 }
 module.exports = (socket) => {
-    socket.on('present', async (data) => {
+    // socket.on('initPresent', async (data) => {
+    //     const token = socket.handshake.headers.token
+    //     const user = await getUserInfo(token)
+    //     if (!user) {
+    //         socket.emit('present', {
+    //             errorCode: true,
+    //             data: 'System error',
+    //         })
+    //         return
+    //     }
+
+    //     socket.join(`present-${data.presentationId}`, () => {
+    //         console.log('client joined the room')
+    //     })
+    //     // join the client to the "chat" room
+    //     socket.join(`chat-${data.presentationId}`, () => {
+    //         console.log('client joined the chat room')
+    //     })
+    // })
+    socket.on('chat', async (data) => {
         const token = socket.handshake.headers.token
         const user = await getUserInfo(token)
-        if (!user) {
-            socket.emit('present', {
+        const chat = await chatCol.findByPresentationId(data.presentationId)
+        let newMessage = {
+            id: ObjectID().toString(),
+            userId: user.id,
+            message: data.message,
+            chatId: chat.id,
+            createdAt: new Date(),
+        }
+        const result = await messageCol.create(newMessage)
+        delete user.password
+        delete user.refreshToken
+        newMessage.user = [user]
+        if (!result) {
+            socket.broadcast.emit(`chat-${data.presentationId}`, {
                 errorCode: true,
                 data: 'System error',
             })
-            return
         }
-        const chat = await chatCol.findByPresentationId(data.presentationId)
+        socket.broadcast.emit(`chat-${data.presentationId}`, {
+            errorCode: null,
+            data: newMessage,
+        })
+    })
+    socket.on('present', async (data) => {
+        console.log('present', data)
         const presentation = await presentationCol.findOne(data.presentationId)
-        socket.on(`present-${data.presentationId}`, (data) => {
-            const currentSlide = presentation.slide.filter(
-                (item) => item.index === data.index
-            )
-            socket.broadcast.emit(
-                `present-${data.presentationId}`,
-                currentSlide
-            )
-        })
-        socket.on(`chat-${data.presentationId}`, async (data) => {
-            let newMessage = {
-                id: ObjectID().toString(),
-                userId: user.id,
-                message: data.message,
-                chatId: chat.id,
-                createdAt: new Date(),
-            }
-            const result = await messageCol.create(newMessage)
-            delete user.password
-            delete user.refreshToken
-            newMessage.user = [user]
-            if (!result) {
-                socket.broadcast.emit(`chat-${data.presentationId}`, {
-                    errorCode: true,
-                    data: 'System error',
-                })
-            }
-            socket.broadcast.emit(`chat-${data.presentationId}`, {
-                errorCode: null,
-                data: newMessage,
-            })
-        })
+        const currentSlide = presentation.slide.filter(
+            (item) => item.index === data.index
+        )
+        socket.broadcast.emit(`present-${data.presentationId}`, currentSlide)
     })
     socket.on('disconnect', () => {
         console.log('user disconnected')
