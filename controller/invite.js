@@ -129,14 +129,14 @@ const joinGroupByEmail = async (req, res) => {
             })
             if (check) {
                 return res.redirect(
-                    `https://group-user.netlify.app/group/${invite.groupId}`
+                    `https://advance-web-presentation.netlify.app/group/${invite.groupId}`
                 )
             }
         }
         let result = await groupCol.addGroup(invite.groupId, data)
         result.members.push(data)
         return res.redirect(
-            `https://group-user.netlify.app/group/${invite.groupId}`
+            `https://advance-web-presentation.netlify.app/group/${invite.groupId}`
         )
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })

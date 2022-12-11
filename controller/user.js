@@ -247,13 +247,15 @@ const verifyGoogle = async (req, res) => {
             )
         return res.json({ errorCode: null, data: user })
     } catch (error) {
-        return res.redirect('https://group-user.netlify.app/login')
+        return res.redirect(
+            'https://advance-web-presentation.netlify.app/login'
+        )
     }
 }
 const verifyEmail = async (req, res) => {
     const email = req.params.code
     const user = await userCol.updateStatus(email)
-    return res.redirect('https://group-user.netlify.app/login')
+    return res.redirect('https://advance-web-presentation.netlify.app/login')
 }
 const changePass = async (req, res) => {
     try {
