@@ -24,25 +24,6 @@ const getUserInfo = async (token) => {
     }
 }
 module.exports = (socket) => {
-    // socket.on('initPresent', async (data) => {
-    //     const token = socket.handshake.headers.token
-    //     const user = await getUserInfo(token)
-    //     if (!user) {
-    //         socket.emit('present', {
-    //             errorCode: true,
-    //             data: 'System error',
-    //         })
-    //         return
-    //     }
-
-    //     socket.join(`present-${data.presentationId}`, () => {
-    //         console.log('client joined the room')
-    //     })
-    //     // join the client to the "chat" room
-    //     socket.join(`chat-${data.presentationId}`, () => {
-    //         console.log('client joined the chat room')
-    //     })
-    // })
     socket.on('chat', async (data) => {
         const token = socket.handshake.headers.token
         const user = await getUserInfo(token)
@@ -70,7 +51,6 @@ module.exports = (socket) => {
         })
     })
     socket.on('present', async (data) => {
-        console.log('present', data)
         const presentation = await presentationCol.findOne(data.presentationId)
         const currentSlide = presentation.slide.filter(
             (item) => item.index === data.index
