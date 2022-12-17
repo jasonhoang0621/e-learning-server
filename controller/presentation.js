@@ -17,8 +17,9 @@ async function create(req, res) {
         let check = false
         for (let i = 0; i < group.members.length; i++) {
             if (
-                group.members[i].id == user.id &&
-                group.members[i].role == 'owner'
+                (group.members[i].id == user.id &&
+                    group.members[i].role == 'owner') ||
+                group.members[i].role == 'co-owner'
             ) {
                 check = true
                 break
@@ -27,7 +28,7 @@ async function create(req, res) {
         if (!check) {
             return res.json({
                 errorCode: true,
-                data: `You don't have permission to create slide in this group`,
+                data: `You don't have permission to create presentation in this group`,
             })
         }
         for (property of presentationCol.createValidation) {
@@ -39,6 +40,7 @@ async function create(req, res) {
             }
         }
         data.createdBy = user.id
+        data.isPresenting = false
         data.createdAt = new Date()
         const presentation = await presentationCol.create(data)
         if (!presentation) {
@@ -206,8 +208,9 @@ async function destroy(req, res) {
         let check = false
         for (let i = 0; i < group.members.length; i++) {
             if (
-                group.members[i].id == user.id &&
-                group.members[i].role == 'owner'
+                (group.members[i].id == user.id &&
+                    group.members[i].role == 'owner') ||
+                group.members[i].role == 'co-owner'
             ) {
                 check = true
                 break
