@@ -342,6 +342,17 @@ const getAll = async (req, res) => {
         return res.json({ errorCode: true, data: 'system error' })
     }
 }
+const forgotPass = async (req, res) => {
+    try {
+        const email = req.body.email
+        const account = await userCol.getDetailByEmail(email)
+        if (!account) {
+            return res.json({ errorCode: true, data: "Account doesn't exist" })
+        }
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'system error' })
+    }
+}
 module.exports = {
     login,
     register,
@@ -354,4 +365,5 @@ module.exports = {
     changePass,
     update,
     getAll,
+    forgotPass,
 }

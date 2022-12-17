@@ -69,5 +69,12 @@ commands = [
         api: '/api/changePass',
         middleware: ['Authorization'],
     },
+    {
+        name: 'forgotPass',
+        controller: 'user',
+        method: 'patch',
+        api: '/api/forgotPass',
+        middleware: [],
+    },
 ]
 module.exports = commands

@@ -165,8 +165,9 @@ async function update(req, res) {
         let check = false
         for (let i = 0; i < group.members.length; i++) {
             if (
-                group.members[i].id == user.id &&
-                group.members[i].role == 'owner'
+                (group.members[i].id == user.id &&
+                    group.members[i].role == 'owner') ||
+                group.members[i].role == 'co-onwer'
             ) {
                 check = true
                 break
@@ -215,7 +216,7 @@ async function destroy(req, res) {
         if (!check) {
             return res.json({
                 errorCode: true,
-                data: `You don't have permission to create slide in this group`,
+                data: `You don't have permission to delete slide in this group`,
             })
         }
         data['deletedAt'] = new Date()

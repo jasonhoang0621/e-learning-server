@@ -193,10 +193,42 @@ const assign = async (req, res) => {
         if (!updated) {
             return res.json({ errorCode: true, data: 'System error' })
         }
-        return res.json({ errorCode: null, data: 'Assign success' })
+        return res.json({ errorCode: null, data: 'Assign successfully' })
     } catch (error) {
         return res.json({ errorCode: true, data: 'System error' })
     }
+}
+const destroy = async (req, res) => {
+    try {
+        const user = req.user
+        const code = req.params.code
+        let group = await groupCol.findOne(code)
+        if (!group) {
+            return res.json({ errorCode: true, data: 'Cannot find this group' })
+        }
+        let check = false
+        for (let i = 0; i < group.members.length; i++) {
+            if (
+                group.members[i].id === user.id &&
+                group.members[i].role === 'owner'
+            ) {
+                check = true
+                break
+            }
+        }
+        if (!check) {
+            return res.json({
+                errorCode: true,
+                data: 'You dont have permission to delete this group',
+            })
+        }
+        group['deletedAt'] = new Date()
+        const updated = await groupCol.update(code, group)
+        if (!updated) {
+            return res.json({ errorCode: true, data: 'System error' })
+        }
+        return res.json({ errorCode: null, data: 'Delete successfully' })
+    } catch (error) {}
 }
 
 module.exports = {
@@ -205,4 +237,5 @@ module.exports = {
     create,
     remove,
     assign,
+    destroy,
 }

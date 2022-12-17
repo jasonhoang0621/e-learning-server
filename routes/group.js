@@ -34,5 +34,12 @@ commands = [
         api: '/api/group/assign/:code',
         middleware: ['Authorization'],
     },
+    {
+        name: 'destroy',
+        controller: 'group',
+        method: 'patch',
+        api: '/api/group/destroy/:code',
+        middleware: ['Authorization'],
+    },
 ]
 module.exports = commands
