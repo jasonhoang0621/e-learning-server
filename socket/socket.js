@@ -1,6 +1,7 @@
 const jwt = require('../utils/token')
 const database = require('../utils/database')
 const chatCol = require('../dataModel/chatCol')
+const answerCol = require('../dataModel/answerCol')
 const messageCol = require('../dataModel/messageCol')
 const presentationCol = require('../dataModel/presentationCol')
 const e = require('express')
@@ -56,6 +57,36 @@ module.exports = (socket) => {
             (item) => item.index === data.index
         )
         socket.broadcast.emit(`present-${data.presentationId}`, currentSlide)
+    })
+    socket.on('answer', async (data) => {
+        const token = socket.handshake.headers.token
+        const user = await getUserInfo(token)
+        let presentation = await presentationCol.findOne(data.presentationId)
+        if (!presentation) {
+            socket.broadcast.emit(`answer-${data.presentationId}`, {
+                errorCode: true,
+                data: 'System error',
+            })
+        }
+        const answer = {
+            id: ObjectID().toString(),
+            presentationId: data.presentationId,
+            userId: user.id,
+            choice: presentation.slide.answer[data.answerIndex],
+            slideIndex: data.index,
+            createdAt: new Date(),
+        }
+        const result = await answerCol.create(answer)
+        presentation.map((item) => {
+            if (item.index === data.index) {
+                item.answer[data.answerIndex].amount += 1
+            }
+        })
+        const currentSlide = presentation.slide.filter(
+            (item) => item.index === data.index
+        )
+        await presentationCol.update(data.presentationId, presentation)
+        socket.broadcast.emit(`answer-${data.presentationId}`, currentSlide)
     })
     socket.on('disconnect', () => {
         console.log('user disconnected')

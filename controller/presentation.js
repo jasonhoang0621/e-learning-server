@@ -40,7 +40,6 @@ async function create(req, res) {
             }
         }
         data.createdBy = user.id
-        data.isPresenting = false
         data.createdAt = new Date()
         const presentation = await presentationCol.create(data)
         if (!presentation) {
@@ -163,6 +162,12 @@ async function update(req, res) {
         const group = await groupCol.findOne(data?.groupId ?? '')
         if (!group) {
             return res.json({ errorCode: true, data: 'Cannot find this group' })
+        }
+        if (group.presenting && group.presenting === code) {
+            return res.json({
+                errorCode: true,
+                data: 'You cannot edit this presentation while presenting',
+            })
         }
         let check = false
         for (let i = 0; i < group.members.length; i++) {

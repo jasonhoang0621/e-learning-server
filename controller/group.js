@@ -74,6 +74,7 @@ async function create(req, res) {
             }
         }
         data.createdBy = user.id
+        data.presenting = null
         data.createdAt = new Date()
         data.members = [{ id: user.id, role: 'owner' }]
         const group = await groupCol.create(data)

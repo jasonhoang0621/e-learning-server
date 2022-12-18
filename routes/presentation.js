@@ -34,5 +34,12 @@ commands = [
         api: '/api/destroy/presentation/:code',
         middleware: ['Authorization'],
     },
+    {
+        name: 'present',
+        controller: 'presentation',
+        method: 'patch',
+        api: '/api/present/presentation/:code',
+        middleware: ['Authorization'],
+    },
 ]
 module.exports = commands

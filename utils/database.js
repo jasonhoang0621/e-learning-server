@@ -7,6 +7,7 @@ let _inviteModel = null
 let _presentationModel = null
 let _chatModel = null
 let _messageModel = null
+let _answerModel = null
 
 async function connectDatabase(callback) {
     const client = new MongoClient(config.uri)
@@ -21,6 +22,7 @@ async function connectDatabase(callback) {
         _presentationModel = db.collection('presentation')
         _chatModel = db.collection('chat')
         _messageModel = db.collection('message')
+        _answerModel = db.collection('answer')
 
         callback()
     } catch (e) {
@@ -74,7 +76,13 @@ const messageModel = function () {
         return _messageModel
     }
 }
-
+const answerModel = function () {
+    if (_answerModel == null) {
+        console.log('Instance is null or undefined')
+    } else {
+        return _answerModel
+    }
+}
 module.exports = {
     userModel,
     groupModel,
@@ -83,4 +91,5 @@ module.exports = {
     messageModel,
     connectDatabase,
     presentationModel,
+    answerModel,
 }
