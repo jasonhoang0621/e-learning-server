@@ -4,6 +4,7 @@ const chatCol = require('../dataModel/chatCol')
 const answerCol = require('../dataModel/answerCol')
 const messageCol = require('../dataModel/messageCol')
 const presentationCol = require('../dataModel/presentationCol')
+const groupCol = require('../dataModel/groupCol')
 const e = require('express')
 const ObjectID = require('mongodb').ObjectId
 
@@ -56,6 +57,9 @@ module.exports = (socket) => {
         const currentSlide = presentation.slide.filter(
             (item) => item.index === data.index
         )
+        await groupCol.update(presentation.groupId, {
+            presenting: data.presentationId,
+        })
         socket.broadcast.emit(`present-${data.presentationId}`, currentSlide)
     })
     socket.on('answer', async (data) => {
