@@ -238,6 +238,53 @@ async function destroy(req, res) {
         return res.json({ errorCode: true, data: 'system error' })
     }
 }
+async function present(req, res) {
+    try {
+        const code = req.params.code
+        const user = req.user
+        const presentation = await presentationCol.findOne(code)
+        if (!presentation) {
+            return res.json({
+                errorCode: true,
+                data: 'Cannot find this presentation',
+            })
+        }
+        let group = await groupCol.findOne(present.groupId)
+        if (group.presenting) {
+            return res.json({
+                errorCode: true,
+                data: 'There is another presentation showing in this group',
+            })
+        }
+        group.presenting = code
+        group.slideIndex = 0
+        await groupCol.update(group.id, group)
+        return res.json({ errorCode: null, data: presentation })
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'System error' })
+    }
+}
+
+async function join(req, res) {
+    try {
+        const code = req.params.code
+        const user = req.user
+        const presentation = await presentationCol.findOne(code)
+        if (!presentation) {
+            return res.json({
+                errorCode: true,
+                data: 'Cannot find this presentation',
+            })
+        }
+        let group = await groupCol.findOne(present.groupId)
+        return res.json({
+            errorCode: null,
+            data: presentation.slide[group.slideIndex],
+        })
+    } catch (error) {
+        return res.json({ errorCode: true, data: 'System error' })
+    }
+}
 
 module.exports = {
     create,
@@ -245,4 +292,6 @@ module.exports = {
     getAll,
     update,
     destroy,
+    present,
+    join,
 }

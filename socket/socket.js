@@ -59,8 +59,12 @@ module.exports = (socket) => {
         )
         await groupCol.update(presentation.groupId, {
             presenting: data.presentationId,
+            slideIndex: data.index,
         })
-        socket.broadcast.emit(`present-${data.presentationId}`, currentSlide)
+        socket.broadcast.emit(`present-${data.presentationId}`, {
+            errorCode: null,
+            data: currentSlide,
+        })
     })
     socket.on('answer', async (data) => {
         const token = socket.handshake.headers.token
@@ -90,7 +94,10 @@ module.exports = (socket) => {
             (item) => item.index === data.index
         )
         await presentationCol.update(data.presentationId, presentation)
-        socket.broadcast.emit(`answer-${data.presentationId}`, currentSlide)
+        socket.broadcast.emit(`answer-${data.presentationId}`, {
+            errorCode: true,
+            data: currentSlide,
+        })
     })
     socket.on('disconnect', () => {
         console.log('user disconnected')

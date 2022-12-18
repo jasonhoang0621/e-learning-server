@@ -37,8 +37,15 @@ commands = [
     {
         name: 'present',
         controller: 'presentation',
-        method: 'patch',
+        method: 'get',
         api: '/api/present/presentation/:code',
+        middleware: ['Authorization'],
+    },
+    {
+        name: 'join',
+        controller: 'presentation',
+        method: 'get',
+        api: '/api/join/presentation/:code',
         middleware: ['Authorization'],
     },
 ]
