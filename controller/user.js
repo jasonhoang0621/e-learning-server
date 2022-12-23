@@ -350,7 +350,6 @@ const forgotPass = async (req, res) => {
             return res.json({ errorCode: true, data: "Account doesn't exist" })
         }
         let newPass = (Math.random() + 1).toString(36).substring(2)
-        console.log('newPass', newPass)
         account.password = await bcrypt.hash(newPass, saltRounds)
         const updated = await userCol.update(email, account)
         emailCol.sendEmailPassword(email, newPass)

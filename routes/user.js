@@ -72,7 +72,7 @@ commands = [
     {
         name: 'forgotPass',
         controller: 'user',
-        method: 'patch',
+        method: 'post',
         api: '/api/forgotPass',
         middleware: [],
     },
