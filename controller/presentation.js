@@ -39,6 +39,7 @@ async function create(req, res) {
                 })
             }
         }
+        data.slide = []
         data.createdBy = user.id
         data.createdAt = new Date()
         const presentation = await presentationCol.create(data)
