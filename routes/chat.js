@@ -4,7 +4,7 @@ commands = [
         controller: 'chat',
         method: 'get',
         api: '/api/chat/:code',
-        middleware: ['Authorization'],
+        middleware: [],
     },
 ]
 module.exports = commands
