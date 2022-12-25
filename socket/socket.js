@@ -88,12 +88,13 @@ module.exports = (socket) => {
             id: ObjectID().toString(),
             presentationId: data.presentationId,
             userId: user.id,
-            choice: presentation.slide.answer[data.answerIndex],
+            choice: presentation.slide[data.index].answer[data.answerIndex]
+                .value,
             slideIndex: data.index,
             createdAt: new Date(),
         }
         const result = await answerCol.create(answer)
-        presentation.map((item) => {
+        presentation.slide.map((item) => {
             if (item.index === data.index) {
                 item.answer[data.answerIndex].amount += 1
             }
@@ -104,7 +105,7 @@ module.exports = (socket) => {
         await presentationCol.update(data.presentationId, presentation)
         socket.broadcast.emit(`answer-${data.presentationId}`, {
             errorCode: true,
-            data: currentSlide,
+            data: presentation,
         })
     })
     socket.on('disconnect', () => {
