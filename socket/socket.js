@@ -63,9 +63,15 @@ module.exports = (socket) => {
         await presentationCol.update(data.presentationId, {
             slideIndex: data.index,
         })
+        if (currentSlide.length == 0) {
+            socket.broadcast.emit(`present-${data.presentationId}`, {
+                errorCode: true,
+                data: 'Cannot find this slide',
+            })
+        }
         socket.broadcast.emit(`present-${data.presentationId}`, {
             errorCode: null,
-            data: currentSlide,
+            data: currentSlide[0],
         })
     })
     socket.on('answer', async (data) => {
