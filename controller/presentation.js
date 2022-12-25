@@ -243,7 +243,7 @@ async function present(req, res) {
     try {
         const code = req.body.presentationId
         const user = req.user
-        const presentation = await presentationCol.findOne(code)
+        let presentation = await presentationCol.findOne(code)
         if (!presentation) {
             return res.json({
                 errorCode: true,
@@ -258,8 +258,9 @@ async function present(req, res) {
             })
         }
         group.presenting = code
-        group.slideIndex = 0
+        presentation.slideIndex = 0
         await groupCol.update(group.id, group)
+        await presentationCol.update(presentation.id, presentation)
         return res.json({ errorCode: null, data: presentation })
     } catch (error) {
         return res.json({ errorCode: true, data: 'System error' })
@@ -270,7 +271,7 @@ async function exitPresent(req, res) {
     try {
         const code = req.body.presentationId
         const user = req.user
-        const presentation = await presentationCol.findOne(code)
+        let presentation = await presentationCol.findOne(code)
         if (!presentation) {
             return res.json({
                 errorCode: true,
@@ -280,8 +281,9 @@ async function exitPresent(req, res) {
         let group = await groupCol.findOne(presentation.groupId)
         if (group.presenting) {
             group.presenting = null
-            group.slideIndex = null
+            presentation.slideIndex = null
             await groupCol.update(group.id, group)
+            await presentationCol.update(presentation.id, presentation)
         }
         return res.json({
             errorCode: null,

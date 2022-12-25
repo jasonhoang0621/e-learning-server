@@ -59,6 +59,8 @@ module.exports = (socket) => {
         )
         await groupCol.update(presentation.groupId, {
             presenting: data.presentationId,
+        })
+        await presentationCol.update(data.presentationId, {
             slideIndex: data.index,
         })
         socket.broadcast.emit(`present-${data.presentationId}`, {
