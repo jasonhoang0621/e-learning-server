@@ -308,7 +308,7 @@ async function join(req, res) {
         let group = await groupCol.findOne(present.groupId)
         return res.json({
             errorCode: null,
-            data: presentation.slide[group.slideIndex],
+            data: presentation.slide[presentation.slideIndex],
         })
     } catch (error) {
         return res.json({ errorCode: true, data: 'System error' })
