@@ -26,6 +26,11 @@ const getUserInfo = async (token) => {
     }
 }
 module.exports = (socket) => {
+    socket.on('presentStatus', async (data) => {
+        socket.broadcast.emit(`presentStatus-${data.presentationId}`, {
+            status: data.status, //true = present, false = stop
+        })
+    })
     socket.on('chat', async (data) => {
         const token = socket.handshake.headers.token
         const user = await getUserInfo(token)
