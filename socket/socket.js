@@ -27,8 +27,10 @@ const getUserInfo = async (token) => {
 }
 module.exports = (socket, io) => {
     socket.on('presentStatus', async (data) => {
+        const presentation = await presentationCol.findOne(data.presentationId)
         socket.broadcast.emit(`presentStatus-${data.presentationId}`, {
             status: data.status, //true = present, false = stop
+            data: presentation,
         })
     })
     socket.on('chat', async (data) => {
