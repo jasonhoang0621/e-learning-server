@@ -11,7 +11,7 @@ commands = [
         controller: 'presentation',
         method: 'get',
         api: '/api/presentation/:code',
-        middleware: ['Authorization'],
+        middleware: [],
     },
     {
         name: 'getAll',

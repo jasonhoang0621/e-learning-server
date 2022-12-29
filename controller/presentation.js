@@ -70,7 +70,7 @@ async function create(req, res) {
 const getOne = async (req, res) => {
     try {
         const id = req.params.code
-        const user = req.user
+        // const user = req.user
         let result = await presentationCol.findOne(id)
         if (!result) {
             return res.json({
@@ -78,20 +78,20 @@ const getOne = async (req, res) => {
                 data: 'Cannot find this presentation',
             })
         }
-        const group = await groupCol.findOne(result.groupId)
-        let check = false
-        for (let i = 0; i < group.members.length; i++) {
-            if (group.members[i].id == user.id) {
-                check = true
-                break
-            }
-        }
-        if (!check) {
-            return res.json({
-                errorCode: true,
-                data: `You don't have permission to view this group`,
-            })
-        }
+        // const group = await groupCol.findOne(result.groupId)
+        // let check = false
+        // for (let i = 0; i < group.members.length; i++) {
+        //     if (group.members[i].id == user.id) {
+        //         check = true
+        //         break
+        //     }
+        // }
+        // if (!check) {
+        //     return res.json({
+        //         errorCode: true,
+        //         data: `You don't have permission to view this group`,
+        //     })
+        // }
         return res.json({ errorCode: null, data: result })
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })
