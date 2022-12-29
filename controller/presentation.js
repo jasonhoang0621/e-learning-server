@@ -1,5 +1,6 @@
 const presentationCol = require('../dataModel/presentationCol')
 const chatCol = require('../dataModel/chatCol')
+const answerCol = require('../dataModel/answerCol')
 const ObjectID = require('mongodb').ObjectId
 const groupCol = require('../dataModel/groupCol')
 const recordPerPage = 100
@@ -234,6 +235,7 @@ async function destroy(req, res) {
             return res.json({ errorCode: true, data: 'System error' })
         }
         await chatCol.destroy(presentation.id)
+
         return res.json({ errorCode: null, data: data })
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })

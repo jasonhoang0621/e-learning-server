@@ -13,7 +13,18 @@ async function getAll(skip, limit, sort, match = {}, join = false) {
     const result = await database.answerModel().aggregate(pipeline).toArray()
     return result
 }
+async function destroy(presentationId) {
+    return await database.answerModel().findOneAndUpdate(
+        { presentationId: presentationId },
+        {
+            $set: {
+                deletedAt: new Date(),
+            },
+        }
+    )
+}
 module.exports = {
     create,
     getAll,
+    destroy,
 }

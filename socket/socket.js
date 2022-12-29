@@ -98,9 +98,21 @@ module.exports = (socket, io) => {
             id: ObjectID().toString(),
             presentationId: data.presentationId,
             userId: user.id,
-            choice: presentation.slide[data.index].answer[data.answerIndex]
-                .value,
-            slideIndex: data.index,
+            question: presentation.slide[data.index].question,
+            answer:
+                presentation.slide[data.index].answer[data.answerIndex]
+                    ?.value ??
+                presentation.slide[data.index].answer[data.answerIndex]?.type,
+            content:
+                `${user.name} chose ` +
+                `${
+                    presentation.slide[data.index].answer[data.answerIndex]
+                        ?.value ??
+                    presentation.slide[data.index].answer[data.answerIndex]
+                        ?.type
+                } for question ${
+                    presentation.slide[data.index].question
+                } at presentation ${presentation.name}`,
             createdAt: new Date(),
         }
         const result = await answerCol.create(answer)
@@ -109,9 +121,6 @@ module.exports = (socket, io) => {
                 item.answer[data.answerIndex].amount += 1
             }
         })
-        const currentSlide = presentation.slide.filter(
-            (item) => item.index === data.index
-        )
         await presentationCol.update(data.presentationId, presentation)
         io.emit(`answer-${data.presentationId}-${data.index}`, {
             errorCode: true,

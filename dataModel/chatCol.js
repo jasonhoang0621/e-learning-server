@@ -12,9 +12,9 @@ async function getOne(id) {
 async function getOneByPresentationId(id) {
     return await database.chatModel().findOne({ presentationId: id })
 }
-async function destroy(id) {
+async function destroy(presentationId) {
     return await database.chatModel().findOneAndUpdate(
-        { id },
+        { presentationId: presentationId },
         {
             $set: {
                 deletedAt: new Date(),

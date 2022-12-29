@@ -5,8 +5,7 @@ const {
     hideUserInfo,
     joinMessageWithUser,
 } = require('../helperFunction/helper')
-const recordPerPage = 10
-const defaultPage = 1
+
 const getOne = async (req, res) => {
     try {
         const sortBy = {
