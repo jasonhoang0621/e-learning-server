@@ -25,7 +25,7 @@ const getUserInfo = async (token) => {
         return null
     }
 }
-module.exports = (socket) => {
+module.exports = (socket, io) => {
     socket.on('chat', async (data) => {
         const token = socket.handshake.headers.token
         const user = await getUserInfo(token)
@@ -79,10 +79,13 @@ module.exports = (socket) => {
         const user = await getUserInfo(token)
         let presentation = await presentationCol.findOne(data.presentationId)
         if (!presentation) {
-            socket.broadcast.emit(`answer-${data.presentationId}`, {
-                errorCode: true,
-                data: 'System error',
-            })
+            socket.broadcast.emit(
+                `answer-${data.presentationId}-${data.index}`,
+                {
+                    errorCode: true,
+                    data: 'System error',
+                }
+            )
         }
         const answer = {
             id: ObjectID().toString(),
@@ -103,7 +106,7 @@ module.exports = (socket) => {
             (item) => item.index === data.index
         )
         await presentationCol.update(data.presentationId, presentation)
-        socket.broadcast.emit(`answer-${data.presentationId}`, {
+        io.emit(`answer-${data.presentationId}-${data.index}`, {
             errorCode: true,
             data: presentation,
         })

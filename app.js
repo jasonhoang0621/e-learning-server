@@ -56,7 +56,7 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
     console.log('User connected')
-    require('./socket/socket.js')(socket)
+    require('./socket/socket.js')(socket, io)
     return io
 })
 
