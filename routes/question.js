@@ -1,6 +1,6 @@
 commands = [
     {
-        name: 'getOne',
+        name: 'getAll',
         controller: 'question',
         method: 'get',
         api: '/api/question/:code',
