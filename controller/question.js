@@ -13,7 +13,7 @@ const getAll = async (req, res) => {
         const code = req.params.code
         let skip = req.query?.skip ?? 0
         skip = parseInt(skip)
-        const limit = Number(req.query?.limit) ?? 20
+        const limit = Number(req.query?.limit ?? 20)
         match = {
             deletedAt: null,
             presentationId: code,

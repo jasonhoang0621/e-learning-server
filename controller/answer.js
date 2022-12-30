@@ -14,12 +14,14 @@ const getAll = async (req, res) => {
         const code = req.params.code
         let skip = req.query?.skip ?? 0
         skip = parseInt(skip)
-        const limit = Number(req.query?.limit) ?? 20
-        match = {
+        const limit = Number(req.query?.limit ?? 20)
+        const match = {
             deletedAt: null,
             presentationId: code,
         }
+        console.log(limit)
         const answer = await answerCol.getAll(skip, limit, sortBy, match)
+        console.log('answer', answer)
         if (!answer) {
             return res.json({
                 errorCode: true,
