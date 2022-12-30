@@ -19,13 +19,7 @@ const getAll = async (req, res) => {
             deletedAt: null,
             presentationId: code,
         }
-        const answer = await answerCol.getAll(
-            skip,
-            limit,
-            sortBy,
-            match,
-            joinMessageWithUser()
-        )
+        const answer = await answerCol.getAll(skip, limit, sortBy, match)
         if (!answer) {
             return res.json({
                 errorCode: true,
