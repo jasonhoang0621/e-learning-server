@@ -1,8 +1,17 @@
-function dataPagination(match, sort, page = 1, limit = 10, join = false) {
+function dataPagination(
+    match,
+    sort,
+    page = 1,
+    limit = 10,
+    join = false,
+    group = false
+) {
     const aggregate = [{ $match: match }]
     let data = []
     data.push({ $sort: sort })
-
+    if (group) {
+        data.push({ $group: group })
+    }
     if (page > 1) {
         let skip = (page - 1) * limit
         data.push({ $skip: skip })
@@ -22,12 +31,26 @@ function dataPagination(match, sort, page = 1, limit = 10, join = false) {
     return aggregate
 }
 
-function dataPaginationSkip(match, sort, skip, limit, join = false) {
+function dataPaginationSkip(
+    match,
+    sort,
+    skip,
+    limit,
+    join = false,
+    group = false,
+    addFields = false
+) {
     const aggregate = [{ $match: match }]
     let data = []
     data.push({ $sort: sort })
     data.push({ $skip: skip })
     data.push({ $limit: limit })
+    if (addFields) {
+        data.push({ $addFields: addFields })
+    }
+    if (group) {
+        data.push({ $group: group })
+    }
 
     if (join) {
         join.forEach((item) => data.push(item))

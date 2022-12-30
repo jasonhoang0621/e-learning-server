@@ -7,9 +7,25 @@ const database = require('../utils/database')
 async function create(data) {
     return await database.answerModel().insertOne(data)
 }
-async function getAll(skip, limit, sort, match = {}, join = false) {
+async function getAll(
+    skip,
+    limit,
+    sort,
+    match = {},
+    join = false,
+    group = false,
+    addFields = false
+) {
     let pipeline = null
-    pipeline = dataPaginationSkip(match, sort, skip, limit, join)
+    pipeline = dataPaginationSkip(
+        match,
+        sort,
+        skip,
+        limit,
+        join,
+        group,
+        addFields
+    )
     const result = await database.answerModel().aggregate(pipeline).toArray()
     return result
 }

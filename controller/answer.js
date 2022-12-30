@@ -19,9 +19,25 @@ const getAll = async (req, res) => {
             deletedAt: null,
             presentationId: code,
         }
-        console.log(limit)
-        const answer = await answerCol.getAll(skip, limit, sortBy, match)
-        console.log('answer', answer)
+
+        const addFields = {
+            date: {
+                $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+            },
+        }
+        const group = {
+            _id: '$date',
+            answer: { $push: '$$ROOT' },
+        }
+        const answer = await answerCol.getAll(
+            skip,
+            limit,
+            sortBy,
+            match,
+            false,
+            group,
+            addFields
+        )
         if (!answer) {
             return res.json({
                 errorCode: true,
