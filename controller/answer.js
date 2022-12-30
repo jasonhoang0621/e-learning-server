@@ -40,7 +40,7 @@ const getAll = async (req, res) => {
         return res.json({
             errorCode: null,
             metadata: answer[0].metadata[0],
-            data: answer[0].data.reverse(),
+            data: answer[0].data,
         })
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })
