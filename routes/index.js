@@ -3,6 +3,8 @@ const groupCommand = require('./group.js')
 const inviteCommand = require('./invite.js')
 const presentationCommand = require('./presentation.js')
 const chatCommand = require('./chat.js')
+const answerCommand = require('./answer.js')
+const questionCommand = require('./question.js')
 
 const event = [
     userCommand,
@@ -10,6 +12,8 @@ const event = [
     inviteCommand,
     presentationCommand,
     chatCommand,
+    answerCommand,
+    questionCommand,
 ]
 const controllers = {
     user: require('../controller/user.js'),
@@ -17,6 +21,8 @@ const controllers = {
     invite: require('../controller/invite.js'),
     presentation: require('../controller/presentation.js'),
     chat: require('../controller/chat.js'),
+    answer: require('../controller/answer.js'),
+    question: require('../controller/question.js'),
 }
 
 const middleWares = {
