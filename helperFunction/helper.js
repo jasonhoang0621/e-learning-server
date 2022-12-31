@@ -42,12 +42,13 @@ function dataPaginationSkip(
 ) {
     const aggregate = [{ $match: match }]
     let data = []
-    data.push({ $sort: sort })
-    data.push({ $skip: skip })
-    data.push({ $limit: limit })
     if (addFields) {
         data.push({ $addFields: addFields })
     }
+    data.push({ $sort: sort })
+    data.push({ $skip: skip })
+    data.push({ $limit: limit })
+
     if (group) {
         data.push({ $group: group })
     }
@@ -59,6 +60,7 @@ function dataPaginationSkip(
         metadata: [{ $count: 'recordTotal' }],
         data: data,
     }
+    console.log('data', data)
     aggregate.push({ $facet: facet })
     return aggregate
 }

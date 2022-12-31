@@ -72,6 +72,7 @@ module.exports = (socket, io) => {
             question: data.question,
             answerQuestion: [],
             upVote: [],
+            isLock: false,
             createdAt: new Date(),
         }
         const result = await questionCol.create(newQuestion)
@@ -164,6 +165,45 @@ module.exports = (socket, io) => {
             errorCode: true,
             data: presentation,
         })
+    })
+    socket.on('update-question', async (data) => {
+        let token = null
+        token = socket.handshake.headers.token ?? null
+
+        let user
+        if (token) {
+            user = await getUserInfo(token)
+        } else {
+            user.id = data?.uid
+            user.name = data?.name
+        }
+        const updated = await questionCol.update(data.questionId, data.question)
+        if (!updated) {
+            io.emit(`update-question-${data.presentationId}`, {
+                errorCode: true,
+                data: 'System error',
+            })
+        } else {
+            let skip = 0
+            const limit = data.length
+            const match = {
+                deletedAt: null,
+                presentationId: data?.presentationId,
+            }
+            const sortBy = {
+                createdAt: -1,
+            }
+            const questions = await questionCol.getAll(
+                skip,
+                limit,
+                sortBy,
+                match
+            )
+            io.emit(`update-question-${data.presentationId}`, {
+                errorCode: null,
+                data: questions[0].data,
+            })
+        }
     })
     socket.on('disconnect', () => {
         console.log('user disconnected')
