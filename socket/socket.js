@@ -3,6 +3,7 @@ const database = require('../utils/database')
 const chatCol = require('../dataModel/chatCol')
 const answerCol = require('../dataModel/answerCol')
 const messageCol = require('../dataModel/messageCol')
+const questionCol = require('../dataModel/questionCol')
 const presentationCol = require('../dataModel/presentationCol')
 const groupCol = require('../dataModel/groupCol')
 const e = require('express')
@@ -57,6 +58,32 @@ module.exports = (socket, io) => {
         socket.broadcast.emit(`chat-${data.presentationId}`, {
             errorCode: null,
             data: newMessage,
+        })
+    })
+    socket.on('question', async (data) => {
+        const token = socket.handshake.headers.token
+        const user = await getUserInfo(token)
+
+        let newQuestion = {
+            id: ObjectID().toString(),
+            userId: user.id,
+            presentationId: data.presentationId,
+            userName: user.name,
+            question: data.question,
+            answerQuestion: [],
+            upVote: [],
+            createdAt: new Date(),
+        }
+        const result = await questionCol.create(newQuestion)
+        if (!result) {
+            io.emit(`question-${data.presentationId}`, {
+                errorCode: true,
+                data: 'System error',
+            })
+        }
+        io.emit(`question-${data.presentationId}`, {
+            errorCode: null,
+            data: newQuestion,
         })
     })
     socket.on('present', async (data) => {
@@ -126,7 +153,7 @@ module.exports = (socket, io) => {
                 } at presentation ${presentation.name}`,
             createdAt: new Date(),
         }
-        const result = await answerCol.create(answer)
+        await answerCol.create(answer)
         presentation.slide.map((item) => {
             if (item.index === data.index) {
                 item.answer[data.answerIndex].amount += 1

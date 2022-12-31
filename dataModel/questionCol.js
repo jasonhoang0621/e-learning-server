@@ -10,7 +10,10 @@ async function getAll(skip, limit, sort, match = {}, join = false) {
     const result = await database.questionModel().aggregate(pipeline).toArray()
     return result
 }
-
+async function create(data) {
+    return await database.questionModel().insertOne(data)
+}
 module.exports = {
     getAll,
+    create,
 }
