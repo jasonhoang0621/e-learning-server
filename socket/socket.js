@@ -84,6 +84,16 @@ module.exports = (socket, io) => {
     socket.on('answer', async (data) => {
         const token = socket.handshake.headers.token
         const user = await getUserInfo(token)
+        if (!user) {
+            socket.broadcast.emit(
+                `answer-${data.presentationId}-${data.index}`,
+                {
+                    errorCode: true,
+                    data: 'System error',
+                }
+            )
+            return
+        }
         let presentation = await presentationCol.findOne(data.presentationId)
         if (!presentation) {
             socket.broadcast.emit(
@@ -98,6 +108,7 @@ module.exports = (socket, io) => {
             id: ObjectID().toString(),
             presentationId: data.presentationId,
             userId: user.id,
+            name: user.name || user.username,
             question: presentation.slide[data.index].question,
             answer:
                 presentation.slide[data.index].answer[data.answerIndex]
