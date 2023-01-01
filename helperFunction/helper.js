@@ -34,8 +34,8 @@ function dataPagination(
 function dataPaginationSkip(
     match,
     sort,
-    skip,
-    limit,
+    skip = false,
+    limit = false,
     join = false,
     group = false,
     addFields = false
@@ -46,8 +46,12 @@ function dataPaginationSkip(
         data.push({ $addFields: addFields })
     }
     data.push({ $sort: sort })
-    data.push({ $skip: skip })
-    data.push({ $limit: limit })
+    if (skip) {
+        data.push({ $skip: skip })
+    }
+    if (limit) {
+        data.push({ $limit: limit })
+    }
 
     if (group) {
         data.push({ $group: group })

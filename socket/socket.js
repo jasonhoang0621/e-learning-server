@@ -110,9 +110,8 @@ module.exports = (socket, io) => {
         })
     })
     socket.on('answer', async (data) => {
-        console.log('answer', data)
         const token = socket.handshake.headers?.token ?? null
-        let user
+        let user = {}
         if (token) {
             user = await getUserInfo(token)
         } else {
@@ -171,6 +170,36 @@ module.exports = (socket, io) => {
         io.emit(`answer-${data.presentationId}-${data.index}`, {
             errorCode: true,
             data: presentation,
+        })
+        const sortBy = {
+            createdAt: -1,
+        }
+        const match = {
+            deletedAt: null,
+            presentationId: data.presentationId,
+        }
+
+        const addFields = {
+            date: {
+                $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+            },
+        }
+        const group = {
+            _id: '$date',
+            answer: { $push: '$$ROOT' },
+        }
+        const history = await answerCol.getAll(
+            false,
+            false,
+            sortBy,
+            match,
+            false,
+            group,
+            addFields
+        )
+        socket.broadcast.emit(`history-${data.presentationId}`, {
+            errorCode: null,
+            data: history[0].data,
         })
     })
     socket.on('update-question', async (data) => {

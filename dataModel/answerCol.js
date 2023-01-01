@@ -16,6 +16,10 @@ async function getAll(
     group = false,
     addFields = false
 ) {
+    let newSort = {
+        date: -1,
+        ...sort,
+    }
     let pipeline = null
     pipeline = dataPaginationSkip(
         match,
