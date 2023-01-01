@@ -70,7 +70,7 @@ module.exports = (socket, io) => {
             presentationId: data.presentationId,
             userName: user.name,
             question: data.question,
-            answerQuestion: [],
+            answer: [],
             upVote: [],
             isLock: false,
             createdAt: new Date(),
