@@ -110,8 +110,15 @@ module.exports = (socket, io) => {
         })
     })
     socket.on('answer', async (data) => {
-        const token = socket.handshake.headers.token
-        const user = await getUserInfo(token)
+        console.log('answer', data)
+        const token = socket.handshake.headers?.token ?? null
+        let user
+        if (token) {
+            user = await getUserInfo(token)
+        } else {
+            user.name = data.name
+            user.id = data.guestId
+        }
         if (!user) {
             socket.broadcast.emit(
                 `answer-${data.presentationId}-${data.index}`,
@@ -136,7 +143,7 @@ module.exports = (socket, io) => {
             id: ObjectID().toString(),
             presentationId: data.presentationId,
             userId: user.id,
-            name: user.name || user.username,
+            name: user.name,
             question: presentation.slide[data.index].question,
             answer:
                 presentation.slide[data.index].answer[data.answerIndex]
