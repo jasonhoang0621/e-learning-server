@@ -169,7 +169,6 @@ module.exports = (socket, io) => {
     socket.on('update-question', async (data) => {
         let token = null
         token = socket.handshake.headers.token ?? null
-
         let user
         if (token) {
             user = await getUserInfo(token)
@@ -184,24 +183,9 @@ module.exports = (socket, io) => {
                 data: 'System error',
             })
         } else {
-            let skip = 0
-            const limit = data.length
-            const match = {
-                deletedAt: null,
-                presentationId: data?.presentationId,
-            }
-            const sortBy = {
-                createdAt: -1,
-            }
-            const questions = await questionCol.getAll(
-                skip,
-                limit,
-                sortBy,
-                match
-            )
             io.emit(`update-question-${data.presentationId}`, {
                 errorCode: null,
-                data: questions[0].data,
+                data: data.question,
             })
         }
     })

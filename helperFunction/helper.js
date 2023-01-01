@@ -60,7 +60,6 @@ function dataPaginationSkip(
         metadata: [{ $count: 'recordTotal' }],
         data: data,
     }
-    console.log('data', data)
     aggregate.push({ $facet: facet })
     return aggregate
 }
