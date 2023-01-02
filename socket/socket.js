@@ -35,19 +35,28 @@ module.exports = (socket, io) => {
         })
     })
     socket.on('chat', async (data) => {
-        const token = socket.handshake.headers.token
-        const user = await getUserInfo(token)
+        const token = socket.handshake.headers?.token ?? null
+        let user = {}
+        if (token) {
+            user = await getUserInfo(token)
+        } else {
+            user.id = data.guestId
+            user.name = data.name
+        }
         const chat = await chatCol.findByPresentationId(data.presentationId)
         let newMessage = {
             id: ObjectID().toString(),
             userId: user.id,
             message: data.message,
             chatId: chat.id,
+            guest: token ? [] : [user],
             createdAt: new Date(),
         }
         const result = await messageCol.create(newMessage)
-        delete user.password
-        delete user.refreshToken
+        if (token) {
+            delete user.password
+            delete user.refreshToken
+        }
         newMessage.user = [user]
         if (!result) {
             socket.broadcast.emit(`chat-${data.presentationId}`, {
