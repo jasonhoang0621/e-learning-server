@@ -96,22 +96,24 @@ const remove = async (req, res) => {
             return res.json({ errorCode: true, data: 'Cannot find this group' })
         }
         let check = true
-        for (let i = 0; i < group.members.length; i++) {
-            if (group.members[i].id == user.id) {
-                if (group.members[i].role == 'owner') {
-                    check = true
-                    break
-                } else if (group.members[i].role == 'member') {
-                    check = false
-                    break
-                } else if (group.members[i].role == 'co-owner') {
-                    for (let j = 0; j < group.members.length; j++) {
-                        if (
-                            group.members[j].role == 'owner' &&
-                            group.members[j].id == body.userId
-                        ) {
-                            check = false
-                            break
+        if (user.id !== body.userId) {
+            for (let i = 0; i < group.members.length; i++) {
+                if (group.members[i].id == user.id) {
+                    if (group.members[i].role == 'owner') {
+                        check = true
+                        break
+                    } else if (group.members[i].role == 'member') {
+                        check = false
+                        break
+                    } else if (group.members[i].role == 'co-owner') {
+                        for (let j = 0; j < group.members.length; j++) {
+                            if (
+                                group.members[j].role == 'owner' &&
+                                group.members[j].id == body.userId
+                            ) {
+                                check = false
+                                break
+                            }
                         }
                     }
                 }

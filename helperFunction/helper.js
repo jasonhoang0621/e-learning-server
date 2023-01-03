@@ -45,16 +45,15 @@ function dataPaginationSkip(
     if (addFields) {
         data.push({ $addFields: addFields })
     }
+    if (group) {
+        data.push({ $group: group })
+    }
     data.push({ $sort: sort })
     if (skip) {
         data.push({ $skip: skip })
     }
     if (limit) {
         data.push({ $limit: limit })
-    }
-
-    if (group) {
-        data.push({ $group: group })
     }
 
     if (join) {

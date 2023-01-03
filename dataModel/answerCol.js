@@ -17,13 +17,13 @@ async function getAll(
     addFields = false
 ) {
     let newSort = {
-        date: -1,
+        _id: -1,
         ...sort,
     }
     let pipeline = null
     pipeline = dataPaginationSkip(
         match,
-        sort,
+        newSort,
         skip,
         limit,
         join,
