@@ -92,7 +92,10 @@ const joinGroup = async (req, res) => {
         }
         let result = await groupCol.addGroup(invite.groupId, data)
         result.members.push(data)
-        return res.json({ errorCode: null, data: result })
+        return res.json({
+            errorCode: null,
+            data: { ...result, userId: user.id },
+        })
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })
     }
@@ -129,14 +132,14 @@ const joinGroupByEmail = async (req, res) => {
             })
             if (check) {
                 return res.redirect(
-                    `https://advance-web-presentation.netlify.app/group/${invite.groupId}`
+                    `https://advance-web-presentation.netlify.app/redirect/${userId}`
                 )
             }
         }
         let result = await groupCol.addGroup(invite.groupId, data)
         result.members.push(data)
         return res.redirect(
-            `https://advance-web-presentation.netlify.app/group/${invite.groupId}`
+            `https://advance-web-presentation.netlify.app/redirect/${userId}`
         )
     } catch (error) {
         return res.json({ errorCode: true, data: 'system error' })
