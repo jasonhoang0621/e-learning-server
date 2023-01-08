@@ -229,6 +229,9 @@ module.exports = (socket, io) => {
                 user.id = data?.guestId
                 user.name = data?.name
             }
+            if (data.question.upVoteLength) {
+                delete data.question.upVoteLength
+            }
             const updated = await questionCol.update(
                 data.questionId,
                 data.question
