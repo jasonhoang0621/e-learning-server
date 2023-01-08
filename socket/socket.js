@@ -104,119 +104,138 @@ module.exports = (socket, io) => {
         })
     })
     socket.on('present', async (data) => {
-        const presentation = await presentationCol.findOne(data.presentationId)
-        const currentSlide = presentation.slide.filter(
-            (item) => item.index === data.index
-        )
-        await groupCol.update(presentation.groupId, {
-            presenting: data.presentationId,
-        })
-        await presentationCol.update(data.presentationId, {
-            slideIndex: data.index,
-        })
-        if (currentSlide.length == 0) {
+        try {
+            const presentation = await presentationCol.findOne(
+                data.presentationId
+            )
+            const currentSlide = presentation.slide.filter(
+                (item) => item.index === data.index
+            )
+            await groupCol.update(presentation.groupId, {
+                presenting: data.presentationId,
+            })
+            await presentationCol.update(data.presentationId, {
+                slideIndex: data.index,
+            })
+            if (currentSlide.length == 0) {
+                socket.broadcast.emit(`present-${data.presentationId}`, {
+                    errorCode: true,
+                    data: 'Cannot find this slide',
+                })
+            }
+            socket.broadcast.emit(`present-${data.presentationId}`, {
+                errorCode: null,
+                data: currentSlide[0],
+            })
+        } catch (error) {
             socket.broadcast.emit(`present-${data.presentationId}`, {
                 errorCode: true,
-                data: 'Cannot find this slide',
+                data: 'System error',
             })
         }
-        socket.broadcast.emit(`present-${data.presentationId}`, {
-            errorCode: null,
-            data: currentSlide[0],
-        })
     })
     socket.on('answer', async (data) => {
-        const token = socket.handshake.headers?.token ?? null
-        let user = {}
-        if (token) {
-            user = await getUserInfo(token)
-        } else {
-            user.name = data.name
-            user.id = data.guestId
-        }
-        if (!user) {
-            socket.broadcast.emit(
-                `answer-${data.presentationId}-${data.index}`,
-                {
-                    errorCode: true,
-                    data: 'System error',
-                }
+        try {
+            const token = socket.handshake.headers?.token ?? null
+            let user = {}
+            if (token) {
+                user = await getUserInfo(token)
+            } else {
+                user.name = data.name
+                user.id = data.guestId
+            }
+            if (!user) {
+                socket.broadcast.emit(
+                    `answer-${data.presentationId}-${data.index}`,
+                    {
+                        errorCode: true,
+                        data: 'System error',
+                    }
+                )
+                return
+            }
+            let presentation = await presentationCol.findOne(
+                data.presentationId
             )
-            return
-        }
-        let presentation = await presentationCol.findOne(data.presentationId)
-        if (!presentation) {
-            socket.broadcast.emit(
-                `answer-${data.presentationId}-${data.index}`,
-                {
-                    errorCode: true,
-                    data: 'System error',
-                }
-            )
-        }
-        const answer = {
-            id: ObjectID().toString(),
-            presentationId: data.presentationId,
-            userId: user.id,
-            name: user.name,
-            question: presentation.slide[data.index].question,
-            answer:
-                presentation.slide[data.index].answer[data.answerIndex]
-                    ?.value ??
-                presentation.slide[data.index].answer[data.answerIndex]?.type,
-            content:
-                `${user.name} chose ` +
-                `${
+            if (!presentation) {
+                socket.broadcast.emit(
+                    `answer-${data.presentationId}-${data.index}`,
+                    {
+                        errorCode: true,
+                        data: 'System error',
+                    }
+                )
+            }
+            const answer = {
+                id: ObjectID().toString(),
+                presentationId: data.presentationId,
+                userId: user.id,
+                name: user.name,
+                question: presentation.slide[data.index].question,
+                answer:
                     presentation.slide[data.index].answer[data.answerIndex]
                         ?.value ??
                     presentation.slide[data.index].answer[data.answerIndex]
-                        ?.type
-                } for question ${
-                    presentation.slide[data.index].question
-                } at presentation ${presentation.name}`,
-            createdAt: new Date(),
-        }
-        await answerCol.create(answer)
-        presentation.slide.map((item) => {
-            if (item.index === data.index) {
-                item.answer[data.answerIndex].amount += 1
+                        ?.type,
+                content:
+                    `${user.name} chose ` +
+                    `${
+                        presentation.slide[data.index].answer[data.answerIndex]
+                            ?.value ??
+                        presentation.slide[data.index].answer[data.answerIndex]
+                            ?.type
+                    } for question ${
+                        presentation.slide[data.index].question
+                    } at presentation ${presentation.name}`,
+                createdAt: new Date(),
             }
-        })
-        await presentationCol.update(data.presentationId, presentation)
-        io.emit(`answer-${data.presentationId}-${data.index}`, {
-            errorCode: true,
-            data: presentation,
-        })
-        const sortBy = {
-            createdAt: -1,
-        }
-        const match = {
-            deletedAt: null,
-            presentationId: data.presentationId,
-        }
+            await answerCol.create(answer)
+            presentation.slide.map((item) => {
+                if (item.index === data.index) {
+                    item.answer[data.answerIndex].amount += 1
+                }
+            })
+            await presentationCol.update(data.presentationId, presentation)
+            io.emit(`answer-${data.presentationId}-${data.index}`, {
+                errorCode: true,
+                data: presentation,
+            })
+            const sortBy = {
+                createdAt: -1,
+            }
+            const match = {
+                deletedAt: null,
+                presentationId: data.presentationId,
+            }
 
-        const addFields = {
-            date: {
-                $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
-            },
+            const addFields = {
+                date: {
+                    $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+                },
+            }
+            const group = {
+                _id: '$date',
+                answer: { $push: '$$ROOT' },
+            }
+            const history = await answerCol.getAll(
+                false,
+                false,
+                sortBy,
+                match,
+                false,
+                group,
+                addFields
+            )
+            socket.broadcast.emit(`history-${data.presentationId}`, {
+                errorCode: null,
+                data: history[0].data,
+            })
+        } catch (error) {
+            socket.broadcast.emit(`history-${data.presentationId}`, {
+                errorCode: true,
+                data: 'System error',
+            })
         }
-        const group = {
-            _id: '$date',
-            answer: { $push: '$$ROOT' },
-        }
-        const history = await answerCol.getAll(
-            false,
-            false,
-            sortBy,
-            match,
-            false,
-            group,
-            addFields
-        )
-        socket.broadcast.emit(`history-${data.presentationId}`, {
-            errorCode: null,
-            data: history[0].data,
-        })
     })
     socket.on('update-question', async (data) => {
         try {
