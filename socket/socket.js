@@ -70,8 +70,15 @@ module.exports = (socket, io) => {
         })
     })
     socket.on('question', async (data) => {
-        const token = socket.handshake.headers.token
-        const user = await getUserInfo(token)
+        let token = null
+        token = socket.handshake.headers.token ?? null
+        let user = {}
+        if (token) {
+            user = await getUserInfo(token)
+        } else {
+            user.id = data?.guestId
+            user.name = data?.name
+        }
 
         let newQuestion = {
             id: ObjectID().toString(),
@@ -212,25 +219,35 @@ module.exports = (socket, io) => {
         })
     })
     socket.on('update-question', async (data) => {
-        let token = null
-        token = socket.handshake.headers.token ?? null
-        let user
-        if (token) {
-            user = await getUserInfo(token)
-        } else {
-            user.id = data?.uid
-            user.name = data?.name
-        }
-        const updated = await questionCol.update(data.questionId, data.question)
-        if (!updated) {
+        try {
+            let token = null
+            token = socket.handshake.headers.token ?? null
+            let user = {}
+            if (token) {
+                user = await getUserInfo(token)
+            } else {
+                user.id = data?.guestId
+                user.name = data?.name
+            }
+            const updated = await questionCol.update(
+                data.questionId,
+                data.question
+            )
+            if (!updated) {
+                io.emit(`update-question-${data.presentationId}`, {
+                    errorCode: true,
+                    data: 'System error',
+                })
+            } else {
+                io.emit(`update-question-${data.presentationId}`, {
+                    errorCode: null,
+                    data: data.question,
+                })
+            }
+        } catch (error) {
             io.emit(`update-question-${data.presentationId}`, {
                 errorCode: true,
                 data: 'System error',
-            })
-        } else {
-            io.emit(`update-question-${data.presentationId}`, {
-                errorCode: null,
-                data: data.question,
             })
         }
     })
