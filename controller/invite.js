@@ -29,7 +29,10 @@ async function create(req, res) {
         const checkOwner = await groupCol.findOne(groupId)
         let check = false
         checkOwner.members.map((item) => {
-            if (item.id === user.id && item.role.includes('owner')) {
+            if (
+                item.id === user.id &&
+                (item.role.includes('owner') || item.role.includes('co-owner'))
+            ) {
                 check = true
             }
         })
